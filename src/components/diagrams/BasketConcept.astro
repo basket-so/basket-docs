@@ -1,209 +1,292 @@
 ---
-// Many tokens in, one token out: each component flows into its own vault, then the basket
-// token appears, backed by all of them. Uses SOLB's components and starting weights.
+// A basket at a glance, with as few words as possible: USDC flows in to mint, the ring shows
+// what one basket token holds (its tokens and their shares), and on redeem the share flows back
+// out as USDC. Uses SOLB's components at their starting weights, for a token worth $1.00.
 import data from '../../data/baskets.json';
 
 const ramp = ['#3f6b4f', '#5f8a68', '#86a37f', '#b3a37f', '#d29a6e', '#b8754a'];
 const basket = data.baskets.find((b) => b.symbol === 'SOLB') ?? data.baskets[0];
 const components = basket.components.slice(0, 6);
-const top = Math.max(...components.map((c) => c.weightBps ?? 1));
+const total = components.reduce((sum, c) => sum + (c.weightBps ?? 0), 0) || 1;
+
+// Ring segments in percent of the circle (pathLength 100), with a small gap after each.
+const GAP = 0.9;
+let start = 0;
+const segments = components.map((c, i) => {
+	const pct = ((c.weightBps ?? 0) / total) * 100;
+	const segment = { symbol: c.symbol, c: ramp[i], pct, start, len: Math.max(pct - GAP, 0.6) };
+	start += pct;
+	return segment;
+});
+const pctLabel = (pct: number) => `${Math.round(pct)}%`;
+
+// Each segment draws in its own window of the loop (percent of --t), and its legend entry
+// appears with it.
+const firstSegment = 30;
+const segmentGap = 4.5;
+const segmentCss = segments
+	.map((s, i) => {
+		const from = firstSegment + i * segmentGap;
+		const to = from + segmentGap + 1;
+		return `.bc .bc-seg-${i} { animation: bc-seg-${i} var(--t) infinite both; }
+.bc .bc-key-${i} { animation: bc-key-${i} var(--t) infinite both; }
+@keyframes bc-seg-${i} { 0%, ${from}% { stroke-dasharray: 0 100; } ${to}%, 100% { stroke-dasharray: ${s.len.toFixed(2)} 100; } }
+@keyframes bc-key-${i} { 0%, ${from}% { opacity: 0.25; } ${from + 2}%, 100% { opacity: 1; } }`;
+	})
+	.join('\n');
+const css = `@media (prefers-reduced-motion: no-preference) {
+${segmentCss}
+}`;
 ---
 
 <figure class="viz not-content bc">
-	<div class="bc-stage" aria-hidden="true">
-		<span class="viz-kicker bc-head" style="grid-column:1">Tokens</span>
-		<span class="viz-kicker bc-head" style="grid-column:3">Basket vaults</span>
-		<span class="viz-kicker bc-head bc-head-out" style="grid-column:5">You hold</span>
-		<span class="bc-frame" style={`grid-row:2 / span ${components.length}`}></span>
-		{components.map((c, i) => (
-			<>
-				<span class="viz-chip bc-chip" style={`grid-row:${i + 2};--c:${ramp[i]};--i:${i}`}><i />{c.symbol}</span>
-				<span class="bc-lane" style={`grid-row:${i + 2};--c:${ramp[i]};--i:${i}`}><b /></span>
-				<span class="bc-slot" style={`grid-row:${i + 2};--c:${ramp[i]};--i:${i};--w:${(c.weightBps ?? 1) / top}`}><b /></span>
-			</>
-		))}
-		<span class="bc-arrow" style={`grid-row:2 / span ${components.length}`}></span>
-		<span class="bc-out" style={`grid-row:2 / span ${components.length}`}>
-			<span class="viz-coin">{basket.symbol}</span>
-			<span class="bc-out-label">1 basket token</span>
-		</span>
+	<div class="viz-loop" aria-hidden="true">
+		<div class="bc-stage">
+			<div class="bc-side bc-in">
+				<span class="viz-kicker">Mint</span>
+				<span class="bc-cash">USDC</span>
+			</div>
+			<div class="bc-lane bc-lane-in">
+				{segments.slice(0, 3).map((s, i) => <b style={`--c:${s.c};--d:${(i * 0.025).toFixed(3)}`} />)}
+			</div>
+			<div class="bc-ring">
+				<svg viewBox="0 0 200 200" role="presentation">
+					<circle class="bc-track" cx="100" cy="100" r="78" pathLength="100" />
+					{segments.map((s, i) => (
+						<circle
+							class={`bc-seg bc-seg-${i}`}
+							cx="100"
+							cy="100"
+							r="78"
+							pathLength="100"
+							stroke={s.c}
+							stroke-dasharray={`${s.len.toFixed(2)} 100`}
+							stroke-dashoffset={(-s.start).toFixed(2)}
+							transform="rotate(-90 100 100)"
+						/>
+					))}
+				</svg>
+				<div class="bc-center">
+					<span class="bc-center-token">1 {basket.symbol}</span>
+					<span class="bc-center-value">$1.00</span>
+				</div>
+			</div>
+			<div class="bc-lane bc-lane-out">
+				{segments.slice(0, 3).map((s, i) => <b style={`--c:${s.c};--d:${(i * 0.025).toFixed(3)}`} />)}
+			</div>
+			<div class="bc-side bc-out">
+				<span class="viz-kicker">Redeem</span>
+				<span class="bc-cash">USDC</span>
+			</div>
+		</div>
+		<ul class="bc-legend">
+			{segments.map((s, i) => (
+				<li class={`bc-key-${i}`}>
+					<i style={`background:${s.c}`} />
+					<b>{s.symbol}</b>
+					<span>{pctLabel(s.pct)}</span>
+				</li>
+			))}
+		</ul>
 	</div>
-	<figcaption class="viz-caption">
-		<b>One token, fully backed.</b> Each token in a basket sits in its own program-owned vault. You hold one basket token, a claim on your share of every vault.
-	</figcaption>
 </figure>
+
+<style is:inline set:html={css}></style>
 
 <style>
 	.bc {
-		--t: 10s;
+		--t: 13s;
 	}
 	.bc-stage {
 		display: grid;
-		grid-template-columns: auto minmax(1rem, 1fr) minmax(4.5rem, 9rem) minmax(1.5rem, 1fr) auto;
-		grid-auto-rows: auto;
-		row-gap: 0.4rem;
+		grid-template-columns: auto minmax(2.5rem, 1fr) auto minmax(2.5rem, 1fr) auto;
 		align-items: center;
 	}
-	.bc-head {
-		grid-row: 1;
-		margin-bottom: 0.15rem;
+	.bc-side {
+		display: grid;
+		justify-items: center;
+		gap: 0.4rem;
 	}
-	.bc-head-out {
-		justify-self: center;
-	}
-	.bc-chip {
-		grid-column: 1;
-		justify-self: start;
+	.bc-cash {
+		padding: 0.3rem 0.7rem;
+		border: 1px solid var(--viz-usdc);
+		border-radius: 999px;
+		background: var(--viz-usdc-soft);
+		color: #2f4a69;
+		font-weight: 600;
+		white-space: nowrap;
 	}
 
-	/* The path from a token to its vault, and the dot that travels it. */
+	/* Lanes: dots carry USDC into the ring (turning into its tokens) and back out. */
 	.bc-lane {
-		grid-column: 2;
 		position: relative;
 		height: 2px;
-		margin: 0 0.35rem;
+		margin: 0 0.6rem;
 		background: repeating-linear-gradient(90deg, var(--viz-line) 0 4px, transparent 4px 8px);
 	}
 	.bc-lane b {
 		position: absolute;
 		top: 50%;
-		left: calc(100% - 0.55rem);
-		width: 0.55rem;
-		height: 0.55rem;
-		margin-top: -0.275rem;
+		left: 0;
+		width: 0.6rem;
+		height: 0.6rem;
+		margin: -0.3rem 0 0 -0.3rem;
 		border-radius: 50%;
-		background: var(--c);
 		opacity: 0;
 	}
 
-	/* The vaults: one frame, one bar per token, sized by its starting weight. */
-	.bc-frame {
-		grid-column: 3;
-		align-self: stretch;
-		margin: -0.45rem 0;
-		border: 1px solid var(--viz-line);
-		border-radius: 5px;
-		background: var(--viz-card);
-	}
-	.bc-slot {
-		grid-column: 3;
-		height: 0.5rem;
-		margin: 0 0.55rem;
-		border-radius: 2px;
-		background: var(--viz-line-soft);
-		overflow: hidden;
-	}
-	.bc-slot b {
-		display: block;
-		height: 100%;
-		width: calc(var(--w) * 100%);
-		min-width: 0.4rem;
-		border-radius: 2px;
-		background: var(--c);
-		transform-origin: left center;
-	}
-
-	/* Vaults to the basket token. */
-	.bc-arrow {
-		grid-column: 4;
+	/* The ring: one segment per token, sized by its share of the basket token's value. */
+	.bc-ring {
 		position: relative;
-		height: 2px;
-		margin: 0 0.4rem;
-		background: var(--viz-copper);
-		transform-origin: left center;
+		width: 13rem;
+		aspect-ratio: 1;
 	}
-	.bc-arrow::after {
-		content: '';
+	.bc-ring svg {
+		display: block;
+		width: 100%;
+		height: 100%;
+		overflow: visible;
+	}
+	.bc-track,
+	.bc-seg {
+		fill: none;
+		stroke-width: 24;
+	}
+	.bc-track {
+		stroke: var(--viz-line-soft);
+	}
+	.bc-center {
 		position: absolute;
-		right: -1px;
-		top: 50%;
-		width: 0.45rem;
-		height: 0.45rem;
-		border-top: 2px solid var(--viz-copper);
-		border-right: 2px solid var(--viz-copper);
-		transform: translateY(-50%) rotate(45deg);
-	}
-	.bc-out {
-		grid-column: 5;
+		inset: 0;
 		display: grid;
+		place-content: center;
 		justify-items: center;
-		gap: 0.4rem;
+		gap: 0.1rem;
+		text-align: center;
 	}
-	.bc-out-label {
-		font-size: 0.75rem;
-		font-weight: 500;
-		color: var(--viz-ink-2);
-		white-space: nowrap;
+	.bc-center-token {
+		font-size: 0.78rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--viz-copper);
+	}
+	.bc-center-value {
+		font-size: 1.9rem;
+		font-weight: 600;
+		letter-spacing: -0.03em;
+		line-height: 1.1;
 	}
 
-	@media (max-width: 30rem) {
+	.bc-legend {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 7rem));
+		justify-content: center;
+		gap: 0.5rem 1.5rem;
+		margin: 1.1rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+	.bc-legend li {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		margin: 0;
+	}
+	.bc-legend i {
+		width: 0.7rem;
+		height: 0.7rem;
+		border-radius: 3px;
+		flex-shrink: 0;
+	}
+	.bc-legend b {
+		font-weight: 600;
+	}
+	.bc-legend span {
+		margin-left: auto;
+		color: var(--viz-muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* Phones: the ring on top, mint and redeem side by side under it. */
+	@media (max-width: 34rem) {
 		.bc-stage {
-			grid-template-columns: auto minmax(0.6rem, 1fr) minmax(4rem, 7rem) minmax(1.1rem, 1fr) auto;
+			grid-template-columns: 1fr 1fr;
+			row-gap: 0.9rem;
 		}
-		.bc-out .viz-coin {
-			width: 3rem;
-			height: 3rem;
-			font-size: 0.72rem;
+		.bc-ring {
+			grid-column: 1 / -1;
+			grid-row: 1;
+			justify-self: center;
+			width: 11rem;
+		}
+		.bc-in {
+			grid-row: 2;
+			grid-column: 1;
+		}
+		.bc-out {
+			grid-row: 2;
+			grid-column: 2;
+		}
+		.bc-lane {
+			display: none;
+		}
+		.bc-legend {
+			grid-template-columns: repeat(2, minmax(0, 7rem));
 		}
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
-		.bc-chip,
-		.bc-lane b,
-		.bc-slot b {
-			animation-duration: var(--t);
-			animation-iteration-count: infinite;
-			animation-fill-mode: both;
-			animation-delay: calc(var(--i) * var(--t) * 0.045);
+		.bc-in .bc-cash {
+			animation: bc-in-glow var(--t) infinite both;
 		}
-		.bc-chip {
-			animation-name: bc-chip;
+		.bc-out .bc-cash {
+			animation: bc-out-glow var(--t) infinite both;
 		}
-		.bc-lane b {
-			animation-name: bc-dot;
-			animation-timing-function: linear;
+		.bc-lane-in b {
+			animation: bc-dot-in var(--t) linear infinite both;
+			animation-delay: calc(var(--d) * var(--t));
 		}
-		.bc-slot b {
-			animation-name: bc-fill;
+		.bc-lane-out b {
+			animation: bc-dot-out var(--t) linear infinite both;
+			animation-delay: calc(var(--d) * var(--t));
 		}
-		.bc-arrow {
-			animation: bc-arrow var(--t) infinite both;
-		}
-		.bc-out {
-			animation: bc-out var(--t) infinite both;
+		.bc-center {
+			animation: bc-center var(--t) infinite both;
 		}
 	}
 
-	/* Per token: the chip lights up, its dot crosses to the vault, the vault fills. The
-	   delay staggers the tokens; the fade at 76-82% clears each one before the next loop. */
-	@keyframes bc-chip {
-		0%, 2% { box-shadow: 0 0 0 0 transparent; }
-		5%, 12% { box-shadow: 0 0 0 2px var(--c); }
-		18%, 100% { box-shadow: 0 0 0 0 transparent; }
+	/* Mint 0-30%, the ring fills 30-58%, redeem 64-97%. */
+	@keyframes bc-in-glow {
+		0%, 4% { box-shadow: 0 0 0 0 transparent; }
+		8%, 24% { box-shadow: 0 0 0 4px var(--viz-usdc-soft); }
+		30%, 100% { box-shadow: 0 0 0 0 transparent; }
 	}
-	@keyframes bc-dot {
-		0%, 3% { left: 0; opacity: 0; }
-		5% { left: 4%; opacity: 1; }
-		15% { left: calc(100% - 0.55rem); opacity: 1; }
-		17%, 100% { left: calc(100% - 0.55rem); opacity: 0; }
+	@keyframes bc-out-glow {
+		0%, 76% { box-shadow: 0 0 0 0 transparent; }
+		80%, 92% { box-shadow: 0 0 0 4px var(--viz-usdc-soft); }
+		97%, 100% { box-shadow: 0 0 0 0 transparent; }
 	}
-	@keyframes bc-fill {
-		0%, 14% { transform: scaleX(0); opacity: 1; }
-		21% { transform: scaleX(1); opacity: 1; }
-		76% { transform: scaleX(1); opacity: 1; }
-		82%, 100% { transform: scaleX(1); opacity: 0; }
+	/* In: leaves as USDC, arrives as one of the basket's tokens. */
+	@keyframes bc-dot-in {
+		0%, 7% { left: 0; opacity: 0; background: var(--viz-usdc); }
+		8% { left: 0; opacity: 1; background: var(--viz-usdc); }
+		15% { background: var(--viz-usdc); }
+		19% { background: var(--c); }
+		24% { left: 100%; opacity: 1; background: var(--c); }
+		26%, 100% { left: 100%; opacity: 0; background: var(--c); }
 	}
-	@keyframes bc-arrow {
-		0%, 44% { transform: scaleX(0); opacity: 1; }
-		50% { transform: scaleX(1); opacity: 1; }
-		76% { transform: scaleX(1); opacity: 1; }
-		82%, 100% { transform: scaleX(1); opacity: 0; }
+	/* Out: leaves as a token, arrives as USDC. */
+	@keyframes bc-dot-out {
+		0%, 65% { left: 0; opacity: 0; background: var(--c); }
+		66% { left: 0; opacity: 1; background: var(--c); }
+		72% { background: var(--c); }
+		76% { background: var(--viz-usdc); }
+		81% { left: 100%; opacity: 1; background: var(--viz-usdc); }
+		83%, 100% { left: 100%; opacity: 0; background: var(--viz-usdc); }
 	}
-	@keyframes bc-out {
-		0%, 49% { opacity: 0; transform: scale(0.6); }
-		55% { opacity: 1; transform: scale(1.06); }
-		58% { opacity: 1; transform: scale(1); }
-		76% { opacity: 1; transform: scale(1); }
-		82%, 100% { opacity: 0; transform: scale(1); }
+	@keyframes bc-center {
+		0%, 50% { opacity: 0; transform: scale(0.9); }
+		56%, 100% { opacity: 1; transform: none; }
 	}
 </style>
