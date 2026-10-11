@@ -1,0 +1,53 @@
+---
+title: Mint a basket
+description: How minting with USDC works, what the quote means, and why it takes several transactions.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import MintFlow from '../../../components/diagrams/MintFlow.astro';
+
+Minting turns USDC into basket tokens. The app buys your share of every token in the basket through Jupiter. The program deposits them in the basket's vaults and then mints basket tokens to you.
+
+## The quote
+
+Enter a **USDC budget** in the Mint panel of a basket's page. The app asks Jupiter for a route into every component and shows:
+
+| Line | Meaning |
+|---|---|
+| **You receive** | Basket tokens you'll get, sized to fit your budget. |
+| **Estimated spend** | USDC the swaps will use, plus the mint fee. |
+| **Unused budget** | What's left of your budget. It never leaves your wallet. |
+| **NAV per token** | What one basket token's holdings are worth at current prices. |
+| **Fee** | The basket's mint fee. Hover it to see how it splits between the treasury, stakers and any creator. |
+| **Route** | USDC → swap → mint. |
+
+The quote refreshes every 30 seconds. If you press **Mint** with an older quote, the app fetches a fresh one first. Your budget is a hard limit. The program won't spend more USDC than the budget you approved, swaps and fees included.
+
+The swaps cost a little more than NAV because of DEX spreads and price impact. Each swap allows up to 0.5% slippage. A thinly traded component costs more to buy in large amounts. So large mints into baskets with small-cap tokens can pay noticeably more than NAV.
+
+## The transactions
+
+A basket with many tokens needs one Jupiter route per token. These routes don't fit in a single Solana transaction, so a mint is split into steps:
+
+1. **Open.** Records your mint and the amount of each token it needs. It also locks in the fee rate.
+2. **Swaps.** Buys the tokens into the basket's vaults, up to three tokens per transaction.
+3. **Finish.** Collects the fee and mints your basket tokens.
+
+A six-token basket takes about four transactions. Your wallet asks you to approve each one in order, because each depends on the one before. The app simulates every transaction before showing it to you.
+
+<MintFlow />
+
+<Aside title="Can't finish?">
+If a step fails or you stop partway, nothing is lost. The tokens already bought stay set aside for you. Come back to the page to **continue the mint** with fresh quotes and the same spending limit. After 20 minutes the mint expires, and you can **recover** the tokens bought so far instead. See [Finish or recover a mint or redeem](/guides/recover/).
+</Aside>
+
+## The first mint into an empty basket
+
+When a basket has no supply, the first mint uses the basket's configured token amounts per basket token, which must divide exactly. If your budget is too small to mint a whole step, the app tells you the minimum.
+
+## Good to know
+
+- **Only USDC.** The Mint panel takes USDC. To start from SOL or another token, swap to USDC first, or buy the basket token in [Markets](/guides/markets/) if it has a pool.
+- **Mints pause during rebalances.** While a fixed-weight basket is rebalancing, new mints and redeems wait for it to finish. The app tells you, and nothing is charged.
+- **One operation at a time per basket.** You can't open a second mint or redeem on the same basket until the first one is finished or recovered. Other people's mints never wait on yours.
+- **Fees are fixed at open.** If a basket's fees change while your mint is running, your mint keeps the rate it opened with.

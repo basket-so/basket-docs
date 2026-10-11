@@ -1,0 +1,253 @@
+---
+// The same three tokens held both ways. One token's price doubles: both baskets drift, then
+// only the fixed-weights basket is rebalanced back to target. Example weights from DEXS.
+const tokens = [
+	{ symbol: 'JUP', c: '#3f6b4f', start: 50, moved: 66.7 },
+	{ symbol: 'RAY', c: '#86a37f', start: 30, moved: 20 },
+	{ symbol: 'ORCA', c: '#d29a6e', start: 20, moved: 13.3 },
+];
+const rows = [
+	{ key: 'units', title: 'Fixed units', note: 'Same token amounts, no trades. The winner is now a bigger share.' },
+	{ key: 'weights', title: 'Fixed weights', note: 'The keeper sells some JUP and buys RAY and ORCA, back to target.' },
+];
+const pct = (n: number) => `${Math.round(n)}%`;
+---
+
+<figure class="viz not-content uw">
+	<div class="uw-stage viz-loop" aria-hidden="true">
+		<div class="uw-price">
+			<span class="viz-chip"><i style="--c:#3f6b4f" />JUP</span>
+			<span class="uw-move">price ×2</span>
+		</div>
+		{rows.map((row) => (
+			<div class={`uw-row uw-${row.key}`}>
+				<div class="uw-head">
+					<span class="uw-title">{row.title}</span>
+					{row.key === 'weights' && (
+						<span class="uw-badge">
+							<span class="uw-badge-due">Rebalancing</span>
+							<span class="uw-badge-done">Back on target</span>
+						</span>
+					)}
+				</div>
+				<div class="uw-bar">
+					{tokens.map((t) => (
+						<span
+							style={`--c:${t.c};--a:${t.start};--b:${t.moved};--z:${row.key === 'weights' ? t.start : t.moved}`}
+						/>
+					))}
+				</div>
+				<ul class="uw-legend">
+					{tokens.map((t) => (
+						<li>
+							<i style={`background:${t.c}`} />
+							<b>{t.symbol}</b>
+							<span class="uw-nums">
+								<span class="uw-n1">{pct(t.start)}</span>
+								<span class="uw-n2">{pct(t.moved)}</span>
+								<span class="uw-n3">{pct(row.key === 'weights' ? t.start : t.moved)}</span>
+							</span>
+						</li>
+					))}
+				</ul>
+				<p class="uw-note">{row.note}</p>
+			</div>
+		))}
+	</div>
+	<figcaption class="viz-caption">
+		<b>Example:</b> 50% JUP, 30% RAY, 20% ORCA, and JUP's price doubles. A fixed-units basket lets the weights drift, like holding the tokens yourself. A fixed-weights basket is traded back to its targets.
+	</figcaption>
+</figure>
+
+<style>
+	.uw {
+		--t: 12s;
+	}
+	.uw-stage {
+		display: grid;
+		gap: 1.1rem;
+	}
+	.uw-price {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.uw-move {
+		font-weight: 600;
+		color: var(--viz-green);
+	}
+	.uw-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+		margin-bottom: 0.45rem;
+	}
+	.uw-title {
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
+	.uw-badge {
+		display: grid;
+		font-size: 0.72rem;
+		font-weight: 600;
+	}
+	.uw-badge > span {
+		grid-area: 1 / 1;
+		justify-self: end;
+		padding: 0.12rem 0.5rem;
+		border-radius: 999px;
+		white-space: nowrap;
+	}
+	.uw-badge-due {
+		background: var(--viz-copper-soft);
+		color: var(--viz-copper);
+		opacity: 0;
+	}
+	.uw-badge-done {
+		background: var(--viz-green-soft);
+		color: var(--viz-green);
+	}
+
+	.uw-bar {
+		display: flex;
+		gap: 2px;
+		height: 1.5rem;
+		border-radius: 3px;
+		overflow: hidden;
+	}
+	.uw-bar span {
+		flex: var(--z) 1 0;
+		background: var(--c);
+	}
+
+	.uw-legend {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 1rem;
+		margin: 0.5rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+	.uw-legend li {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		margin: 0;
+	}
+	.uw-legend i {
+		width: 0.6rem;
+		height: 0.6rem;
+		border-radius: 2px;
+	}
+	.uw-legend b {
+		font-weight: 500;
+	}
+	.uw-nums {
+		display: grid;
+		color: var(--viz-muted);
+		font-variant-numeric: tabular-nums;
+		min-width: 2.2rem;
+	}
+	.uw-nums > span {
+		grid-area: 1 / 1;
+	}
+	.uw-n1,
+	.uw-n2 {
+		opacity: 0;
+	}
+	.uw-note {
+		margin: 0.35rem 0 0;
+		color: var(--viz-muted);
+		font-size: 0.78rem;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.uw-move {
+			animation: uw-move var(--t) infinite both;
+		}
+		.uw-bar span {
+			animation: uw-units var(--t) infinite both;
+		}
+		.uw-weights .uw-bar span {
+			animation-name: uw-weights;
+		}
+		.uw-n1 {
+			animation: uw-n1 var(--t) infinite both;
+		}
+		.uw-n2 {
+			animation: uw-n2 var(--t) infinite both;
+		}
+		.uw-n3 {
+			animation: uw-n3 var(--t) infinite both;
+		}
+		.uw-units .uw-n2 {
+			animation-name: uw-n2-hold;
+		}
+		.uw-units .uw-n3 {
+			opacity: 0;
+			animation: none;
+		}
+		.uw-badge-due {
+			animation: uw-due var(--t) infinite both;
+		}
+		.uw-badge-done {
+			animation: uw-done var(--t) infinite both;
+		}
+		.uw-note {
+			animation: uw-note var(--t) infinite both;
+		}
+		.uw-weights .uw-note {
+			animation-name: uw-note-late;
+		}
+	}
+
+	@keyframes uw-move {
+		0%, 12% { opacity: 0; transform: translateX(-0.3rem); }
+		16%, 100% { opacity: 1; transform: none; }
+	}
+	/* Segment widths: --a at the start, --b after the price move, back to --a on rebalance. */
+	@keyframes uw-units {
+		0%, 16% { flex-grow: var(--a); }
+		30%, 100% { flex-grow: var(--b); }
+	}
+	@keyframes uw-weights {
+		0%, 16% { flex-grow: var(--a); }
+		30%, 46% { flex-grow: var(--b); }
+		60%, 100% { flex-grow: var(--a); }
+	}
+	@keyframes uw-n1 {
+		0%, 22% { opacity: 1; }
+		24%, 100% { opacity: 0; }
+	}
+	@keyframes uw-n2 {
+		0%, 22% { opacity: 0; }
+		24%, 52% { opacity: 1; }
+		54%, 100% { opacity: 0; }
+	}
+	@keyframes uw-n2-hold {
+		0%, 22% { opacity: 0; }
+		24%, 100% { opacity: 1; }
+	}
+	@keyframes uw-n3 {
+		0%, 52% { opacity: 0; }
+		54%, 100% { opacity: 1; }
+	}
+	@keyframes uw-due {
+		0%, 40% { opacity: 0; }
+		43%, 58% { opacity: 1; }
+		61%, 100% { opacity: 0; }
+	}
+	@keyframes uw-done {
+		0%, 59% { opacity: 0; }
+		62%, 100% { opacity: 1; }
+	}
+	@keyframes uw-note {
+		0%, 28% { opacity: 0; }
+		32%, 100% { opacity: 1; }
+	}
+	@keyframes uw-note-late {
+		0%, 42% { opacity: 0; }
+		46%, 100% { opacity: 1; }
+	}
+</style>

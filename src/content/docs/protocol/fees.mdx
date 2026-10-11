@@ -1,0 +1,66 @@
+---
+title: Fees
+description: What minting and redeeming cost, where the fees go, and who can change them.
+---
+
+import data from '../../../data/baskets.json';
+import FeeSplit from '../../../components/diagrams/FeeSplit.astro';
+
+export const pct = (bps) => `${(bps / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}%`;
+
+Basket charges a fee when you mint and when you redeem. There's no fee for holding a basket token, and no management fee.
+
+## How the fee works
+
+- **What it's charged on:** the USDC that actually moves through the swaps. A mint's fee is on the USDC spent buying the tokens. A redeem's fee is on the USDC the sales bring in.
+- **Mints:** the fee is collected in USDC in the last step, on top of what the swaps spent. Your budget covers both.
+- **Redeems:** each sale's share of the fee comes out of its proceeds, so you receive the proceeds after fees.
+- **Locked in when you start:** the rates are fixed when a mint or redeem opens, even if the basket's fees change while it's running.
+- **Rounding:** each share is rounded up to the next USDC atom (0.000001 USDC).
+
+## Where it goes
+
+Each basket's fee has up to three shares:
+
+- **Protocol**, to the Basket treasury.
+- **Stakers**, to the USDC reward vault for [BASKET stakers](/guides/staking/).
+- **Creator**, to a basket's creator fee recipient, if it has one. Otherwise this share goes to the treasury.
+
+<FeeSplit />
+
+## Current fees
+
+<table>
+	<thead>
+		<tr><th>Basket</th><th>Total</th><th>Treasury</th><th>Stakers</th><th>Creator</th></tr>
+	</thead>
+	<tbody>
+		{data.baskets.map((b) => (
+			<tr>
+				<td><a href={`/baskets/live-baskets/#${b.symbol.toLowerCase()}`}>{b.symbol}</a></td>
+				<td>{pct(b.feeBps.total)}</td>
+				<td>{pct(b.feeBps.protocol)}</td>
+				<td>{pct(b.feeBps.staking)}</td>
+				<td>{pct(b.feeBps.creator)}</td>
+			</tr>
+		))}
+	</tbody>
+</table>
+
+The same rates apply to mints and redeems. They're read from the chain as of {data.updated}. The app always shows a basket's current fee in its Mint and Redeem panels.
+
+## Limits
+
+- The three shares together can't exceed **1%** per mint or redeem. The program refuses any higher setting.
+- A basket's authority can lower its fees at any time.
+- **Raising a fee needs three days' notice** once a basket has holders. The increase is announced on-chain and can be applied only after three days, within the following seven, or it lapses. Until then you can mint and redeem at the old fee.
+- Changing the redeem fee also restarts the notice period of any pending [composition change](/baskets/composition-changes/).
+
+## In-kind mints and redeems
+
+The program also supports in-kind mints and redeems, which move the component tokens themselves. The app interface doesn't expose this feature. Their fee is taken in each component token. Staking rewards are paid only in USDC, so the stakers' share goes to the treasury.
+
+## Other costs
+
+- **Swap costs.** Jupiter routes pay DEX fees, spreads and price impact. These are part of the swap, not a Basket fee. They're why minting costs a little more than NAV and redeeming returns a little less.
+- **Network fees** in SOL for each transaction, plus small refundable deposits for the accounts an operation creates.

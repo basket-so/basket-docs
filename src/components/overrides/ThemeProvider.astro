@@ -1,0 +1,8 @@
+---
+// The docs are light-only: replaces Starlight's theme provider, which would follow the
+// visitor's system setting or a saved choice. Inline so the first paint is already light.
+---
+
+<script is:inline>
+	document.documentElement.dataset.theme = 'light';
+</script>

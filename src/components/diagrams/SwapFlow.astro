@@ -1,0 +1,485 @@
+---
+// A mint or a redeem, transaction by transaction, with real amounts: what leaves and
+// arrives in your wallet, and what each vault receives or sells. Uses SOLB's six tokens
+// and fee. Mint buys three tokens per transaction; a redeem sells three per transaction.
+import data from '../../data/baskets.json';
+
+interface Props {
+	kind: 'mint' | 'redeem';
+}
+const { kind } = Astro.props;
+const mint = kind === 'mint';
+
+const ramp = ['#3f6b4f', '#5f8a68', '#86a37f', '#b3a37f', '#d29a6e', '#b8754a'];
+const basket = data.baskets.find((b) => b.symbol === 'SOLB') ?? data.baskets[0];
+const tokens = basket.components.slice(0, 6);
+const weights = tokens.map((t) => t.weightBps ?? 1);
+const totalWeight = weights.reduce((a, b) => a + b, 0);
+const top = Math.max(...weights);
+const feeRate = basket.feeBps.total / 10000;
+const money = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// Mint: a $100 budget, $99 of swaps, the fee on top. Redeem: 100 tokens at a $1.00 NAV,
+// each sale's fee taken from its proceeds. Swap costs are left out of both.
+const budget = 100;
+const spend = 99;
+const legs = tokens.map((t, i) => {
+	const value = (mint ? spend : budget) * (weights[i] / totalWeight);
+	const amount = Math.round((mint ? value : value * (1 - feeRate)) * 100) / 100;
+	return { ...t, c: ramp[i], bar: weights[i] / top, amount };
+});
+const batchA = legs.slice(0, 3).reduce((a, l) => a + l.amount, 0);
+const batchB = legs.slice(3).reduce((a, l) => a + l.amount, 0);
+const fee = spend * feeRate;
+const names = (from: number) => legs.slice(from, from + 3).map((l) => l.symbol);
+const list = (s: string[]) => `${s[0]}, ${s[1]} and ${s[2]}`;
+const pct = `${(feeRate * 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}%`;
+
+// Each wallet line steps through values; --w names the window it shows in, and the last
+// value is the one a static (no-motion) diagram shows.
+const wallet = mint
+	? [
+			{ label: 'USDC', values: [[money(budget), 'sf-w-0-34'], [money(budget - batchA), 'sf-w-34-58'], [money(budget - spend), 'sf-w-58-68'], [money(budget - spend - fee), 'sf-w-68-100']] },
+			{ label: basket.symbol, values: [['0', 'sf-w-0-70'], [`≈ ${Math.round(spend)}`, 'sf-w-70-100']] },
+		]
+	: [
+			{ label: basket.symbol, values: [[money(budget), 'sf-w-0-10'], ['0', 'sf-w-10-100']] },
+			{ label: 'USDC', values: [['0.00', 'sf-w-0-34'], [money(batchA), 'sf-w-34-58'], [money(batchA + batchB), 'sf-w-58-100']] },
+		];
+
+const steps = mint
+	? [
+			['Tx 1', 'Open'],
+			['Tx 2', `Buy ${names(0).join(', ')}`],
+			['Tx 3', `Buy ${names(3).join(', ')}`],
+			['Tx 4', 'Finish'],
+		]
+	: [
+			['Tx 1', 'Open'],
+			['Tx 2', `Sell ${names(0).join(', ')}`],
+			['Tx 3', `Sell ${names(3).join(', ')}, done`],
+		];
+const says = mint
+	? [
+			`<b>Open.</b> The program records the mint: what each vault needs, your $${budget} limit and the fee rate.`,
+			`<b>Buy ${list(names(0))}.</b> Jupiter swaps your USDC straight into each token's vault.`,
+			`<b>Buy ${list(names(3))}.</b> The next transaction buys the rest. Each vault must receive at least what the mint needs.`,
+			`<b>Finish.</b> You pay the ${pct} fee in USDC and receive your ${basket.symbol}. The unspent $${money(budget - spend - fee)} never left your wallet.`,
+		]
+	: [
+			`<b>Open.</b> Your ${budget} ${basket.symbol} are burned, and your share of every vault is set aside for you.`,
+			`<b>Sell ${list(names(0))}.</b> Jupiter sells your share of each. The USDC, less the ${pct} fee, goes straight to your wallet.`,
+			`<b>Sell ${list(names(3))}.</b> The last sale also completes the redeem. There's no separate final step.`,
+		];
+const example = mint
+	? `Example: a $${budget} budget into ${basket.symbol} at a NAV of $1.00, leaving out swap costs.`
+	: `Example: redeeming ${budget} ${basket.symbol} at a NAV of $1.00, leaving out swap costs.`;
+---
+
+<figure class={`viz not-content sf sf-${kind}`}>
+	<div aria-hidden="true">
+		<ol class="viz-rail">
+			{steps.map(([tx, what], i) => <li data-s={i + 1}><b>{tx}</b>{what}</li>)}
+		</ol>
+		<div class="sf-stage viz-loop">
+			<div class="sf-card sf-wallet">
+				<span class="viz-kicker">Your wallet</span>
+				{wallet.map((line) => (
+					<div class="sf-line">
+						<span class="sf-label">{line.label}</span>
+						<span class="sf-num">
+							{line.values.map(([v, w], i) => (
+								<span class={i === line.values.length - 1 ? 'sf-final' : ''} style={`--w:${w}`}>{v}</span>
+							))}
+						</span>
+					</div>
+				))}
+				{mint && <span class="sf-fee">− {money(fee)} fee</span>}
+			</div>
+
+			<div class="sf-pipe">
+				<span class="sf-pipe-label">Jupiter swaps</span>
+				{legs.map((l, i) => (
+					<b style={`--c:${l.c};--d:${(Math.floor(i / 3) * 0.24 + (i % 3) * 0.015).toFixed(3)}`} />
+				))}
+			</div>
+
+			<div class="sf-card sf-vaults">
+				<span class="viz-kicker">Basket vaults</span>
+				{legs.map((l, i) => (
+					<div class={`sf-row ${i < 3 ? 'sf-a' : 'sf-b'}`} style={`--c:${l.c};--bar:${l.bar}`}>
+						<span class="viz-chip"><i />{l.symbol}</span>
+						<span class="sf-track"><b /></span>
+						<span class="sf-amt">{mint ? '+' : ''}${money(l.amount)}</span>
+					</div>
+				))}
+			</div>
+		</div>
+	</div>
+	<ul class="viz-says">
+		{says.map((s, i) => <li data-s={i + 1} set:html={s} />)}
+	</ul>
+	<figcaption class="viz-caption">{example}</figcaption>
+</figure>
+
+<style>
+	.sf {
+		--t: 14s;
+	}
+	.sf-stage {
+		display: grid;
+		grid-template-columns: minmax(8rem, 0.85fr) minmax(3.5rem, 0.6fr) minmax(13.5rem, 1.7fr);
+		align-items: center;
+	}
+	.sf-card {
+		display: grid;
+		gap: 0.45rem;
+		padding: 0.7rem 0.8rem;
+		border: 1px solid var(--viz-line);
+		border-radius: 5px;
+		background: var(--viz-card);
+	}
+
+	/* Wallet balances: each value sits in the same spot and takes its turn. */
+	.sf-wallet {
+		position: relative;
+	}
+	.sf-line {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 0.75rem;
+	}
+	.sf-label {
+		color: var(--viz-muted);
+		font-weight: 500;
+	}
+	.sf-num {
+		display: grid;
+		justify-items: end;
+		font-size: 1.1rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+	.sf-num > span {
+		grid-area: 1 / 1;
+		white-space: nowrap;
+		opacity: 0;
+	}
+	.sf-num > .sf-final {
+		opacity: 1;
+	}
+	.sf-fee {
+		display: none;
+	}
+
+	/* The pipe between wallet and vaults, and the swaps that travel it. */
+	.sf-pipe {
+		position: relative;
+		height: 2px;
+		margin: 0 0.6rem;
+		background: var(--viz-line);
+	}
+	.sf-pipe::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		width: 0.45rem;
+		height: 0.45rem;
+		border-top: 2px solid var(--viz-line);
+		border-right: 2px solid var(--viz-line);
+	}
+	.sf-mint .sf-pipe::after {
+		right: 0;
+		transform: translateY(-50%) rotate(45deg);
+	}
+	.sf-redeem .sf-pipe::after {
+		left: 0;
+		transform: translateY(-50%) rotate(-135deg);
+	}
+	.sf-pipe-label {
+		position: absolute;
+		left: 50%;
+		bottom: 0.5rem;
+		transform: translateX(-50%);
+		font-size: 0.68rem;
+		color: var(--viz-muted);
+		white-space: nowrap;
+	}
+	.sf-pipe b {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 0.6rem;
+		height: 0.6rem;
+		margin: -0.3rem 0 0 -0.3rem;
+		border-radius: 50%;
+		opacity: 0;
+	}
+
+	/* One row per vault: the bar is what this mint buys, or your share a redeem sells. */
+	.sf-row {
+		display: grid;
+		grid-template-columns: 4.4rem 1fr 3.9rem;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.sf-row .viz-chip {
+		justify-self: start;
+	}
+	.sf-track {
+		height: 0.5rem;
+		border-radius: 999px;
+		background: var(--viz-line-soft);
+		overflow: hidden;
+	}
+	.sf-track b {
+		display: block;
+		height: 100%;
+		width: calc(var(--bar) * 100%);
+		min-width: 0.4rem;
+		border-radius: 999px;
+		background: var(--c);
+		transform-origin: left;
+	}
+	.sf-redeem .sf-track b {
+		transform: scaleX(0);
+	}
+	.sf-amt {
+		justify-self: end;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+	}
+	.sf-redeem .sf-amt {
+		color: #2f4a69;
+	}
+
+	/* Phones: wallet on top, vaults below, the pipe running vertically between them. */
+	@media (max-width: 34rem) {
+		.sf-stage {
+			grid-template-columns: 1fr;
+		}
+		.sf-wallet {
+			align-self: stretch;
+		}
+		.sf-pipe {
+			justify-self: center;
+			width: 2px;
+			height: 2.6rem;
+			margin: 0.3rem 0;
+		}
+		.sf-mint .sf-pipe::after {
+			top: auto;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%) rotate(135deg);
+		}
+		.sf-redeem .sf-pipe::after {
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%) rotate(-45deg);
+		}
+		.sf-pipe-label {
+			left: 0.7rem;
+			bottom: auto;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+		.sf-pipe b {
+			left: 50%;
+		}
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		[data-s='1'] { animation: sf-s1 var(--t) infinite both; }
+		[data-s='2'] { animation: sf-s2 var(--t) infinite both; }
+		[data-s='3'] { animation: sf-s3 var(--t) infinite both; }
+		[data-s='4'] { animation: sf-s4 var(--t) infinite both; }
+		.sf-redeem [data-s='3'] { animation-name: sf-s3-last; }
+
+		.sf-num > span {
+			animation: var(--w) var(--t) infinite both;
+		}
+		.sf-fee {
+			display: block;
+			position: absolute;
+			right: 0.8rem;
+			bottom: -1.2rem;
+			font-size: 0.72rem;
+			font-weight: 600;
+			color: var(--viz-copper);
+			animation: sf-fee var(--t) infinite both;
+		}
+
+		.sf-pipe b {
+			animation: sf-right var(--t) linear infinite both;
+			animation-delay: calc(var(--d) * var(--t));
+		}
+		.sf-redeem .sf-pipe b {
+			animation-name: sf-left;
+		}
+
+		.sf-row .viz-chip {
+			animation: sf-ring-a var(--t) infinite both;
+		}
+		.sf-b .viz-chip {
+			animation-name: sf-ring-b;
+		}
+		.sf-mint .sf-a .sf-track b { animation: sf-buy-a var(--t) infinite both; }
+		.sf-mint .sf-b .sf-track b { animation: sf-buy-b var(--t) infinite both; }
+		.sf-redeem .sf-a .sf-track b { animation: sf-sell-a var(--t) infinite both; }
+		.sf-redeem .sf-b .sf-track b { animation: sf-sell-b var(--t) infinite both; }
+		.sf-a .sf-amt { animation: sf-w-34-100 var(--t) infinite both; }
+		.sf-b .sf-amt { animation: sf-w-58-100 var(--t) infinite both; }
+	}
+	@media (prefers-reduced-motion: no-preference) and (max-width: 34rem) {
+		.sf-mint .sf-pipe b {
+			animation-name: sf-down;
+		}
+		.sf-redeem .sf-pipe b {
+			animation-name: sf-up;
+		}
+	}
+
+	/* Steps: Open 0-16%, first three tokens 16-40%, next three 40-64%, finish to the end. */
+	@keyframes sf-s1 {
+		0% { --viz-on: 0; }
+		2%, 15% { --viz-on: 1; }
+		17%, 100% { --viz-on: 0; }
+	}
+	@keyframes sf-s2 {
+		0%, 15% { --viz-on: 0; }
+		17%, 39% { --viz-on: 1; }
+		41%, 100% { --viz-on: 0; }
+	}
+	@keyframes sf-s3 {
+		0%, 39% { --viz-on: 0; }
+		41%, 63% { --viz-on: 1; }
+		65%, 100% { --viz-on: 0; }
+	}
+	@keyframes sf-s3-last {
+		0%, 39% { --viz-on: 0; }
+		41%, 97% { --viz-on: 1; }
+		100% { --viz-on: 0; }
+	}
+	@keyframes sf-s4 {
+		0%, 63% { --viz-on: 0; }
+		65%, 97% { --viz-on: 1; }
+		100% { --viz-on: 0; }
+	}
+
+	/* Windows for values that take turns: sf-w-A-B shows from A% to B% of the loop. */
+	@keyframes sf-w-0-10 {
+		0%, 9% { opacity: 1; }
+		11%, 100% { opacity: 0; }
+	}
+	@keyframes sf-w-10-100 {
+		0%, 9% { opacity: 0; }
+		11%, 100% { opacity: 1; }
+	}
+	@keyframes sf-w-0-34 {
+		0%, 33% { opacity: 1; }
+		35%, 100% { opacity: 0; }
+	}
+	@keyframes sf-w-34-58 {
+		0%, 33% { opacity: 0; }
+		35%, 57% { opacity: 1; }
+		59%, 100% { opacity: 0; }
+	}
+	@keyframes sf-w-34-100 {
+		0%, 33% { opacity: 0; }
+		35%, 100% { opacity: 1; }
+	}
+	@keyframes sf-w-58-68 {
+		0%, 57% { opacity: 0; }
+		59%, 67% { opacity: 1; }
+		69%, 100% { opacity: 0; }
+	}
+	@keyframes sf-w-58-100 {
+		0%, 57% { opacity: 0; }
+		59%, 100% { opacity: 1; }
+	}
+	@keyframes sf-w-68-100 {
+		0%, 67% { opacity: 0; }
+		69%, 100% { opacity: 1; }
+	}
+	@keyframes sf-w-0-70 {
+		0%, 69% { opacity: 1; }
+		71%, 100% { opacity: 0; }
+	}
+	@keyframes sf-w-70-100 {
+		0%, 69% { opacity: 0; transform: scale(1); }
+		71% { opacity: 1; transform: scale(1.15); }
+		74%, 100% { opacity: 1; transform: scale(1); }
+	}
+	@keyframes sf-fee {
+		0%, 65% { opacity: 0; }
+		68%, 84% { opacity: 1; }
+		88%, 100% { opacity: 0; }
+	}
+
+	/* A swap crosses the pipe once. --d sets its batch (+24%) and its place in the batch. */
+	@keyframes sf-right {
+		0%, 21% { left: 0; opacity: 0; background: var(--viz-usdc); }
+		22% { left: 0; opacity: 1; background: var(--viz-usdc); }
+		26% { background: var(--viz-usdc); }
+		29% { background: var(--c); }
+		33% { left: 100%; opacity: 1; background: var(--c); }
+		34%, 100% { left: 100%; opacity: 0; background: var(--c); }
+	}
+	@keyframes sf-left {
+		0%, 21% { left: 100%; opacity: 0; background: var(--c); }
+		22% { left: 100%; opacity: 1; background: var(--c); }
+		26% { background: var(--c); }
+		29% { background: var(--viz-usdc); }
+		33% { left: 0; opacity: 1; background: var(--viz-usdc); }
+		34%, 100% { left: 0; opacity: 0; background: var(--viz-usdc); }
+	}
+	@keyframes sf-down {
+		0%, 21% { top: 0; opacity: 0; background: var(--viz-usdc); }
+		22% { top: 0; opacity: 1; background: var(--viz-usdc); }
+		26% { background: var(--viz-usdc); }
+		29% { background: var(--c); }
+		33% { top: 100%; opacity: 1; background: var(--c); }
+		34%, 100% { top: 100%; opacity: 0; background: var(--c); }
+	}
+	@keyframes sf-up {
+		0%, 21% { top: 100%; opacity: 0; background: var(--c); }
+		22% { top: 100%; opacity: 1; background: var(--c); }
+		26% { background: var(--c); }
+		29% { background: var(--viz-usdc); }
+		33% { top: 0; opacity: 1; background: var(--viz-usdc); }
+		34%, 100% { top: 0; opacity: 0; background: var(--viz-usdc); }
+	}
+
+	@keyframes sf-ring-a {
+		0%, 17% { box-shadow: 0 0 0 0 transparent; }
+		19%, 37% { box-shadow: 0 0 0 2px var(--c); }
+		40%, 100% { box-shadow: 0 0 0 0 transparent; }
+	}
+	@keyframes sf-ring-b {
+		0%, 41% { box-shadow: 0 0 0 0 transparent; }
+		43%, 61% { box-shadow: 0 0 0 2px var(--c); }
+		64%, 100% { box-shadow: 0 0 0 0 transparent; }
+	}
+	@keyframes sf-buy-a {
+		0%, 27% { transform: scaleX(0); }
+		34%, 100% { transform: scaleX(1); }
+	}
+	@keyframes sf-buy-b {
+		0%, 51% { transform: scaleX(0); }
+		58%, 100% { transform: scaleX(1); }
+	}
+	/* Redeem: your share is set aside at open (it appears), then sold (it drains). */
+	@keyframes sf-sell-a {
+		0%, 4% { transform: scaleX(0); }
+		10%, 22% { transform: scaleX(1); }
+		30%, 100% { transform: scaleX(0); }
+	}
+	@keyframes sf-sell-b {
+		0%, 4% { transform: scaleX(0); }
+		10%, 46% { transform: scaleX(1); }
+		54%, 100% { transform: scaleX(0); }
+	}
+</style>

@@ -1,0 +1,408 @@
+---
+// How staking rewards are shared. Each fee's staker share is split by stake at that moment.
+// B unstakes partway: B's rewards stay B's to claim, and the next fee goes to A and C only.
+// The stakers, their stakes and the $1.00 fees are a made-up example.
+const money = (n: number) => `$${n.toFixed(2)}`;
+const pct = (n: number) => `${Math.round(n * 100)}%`;
+const total1 = 1000;
+const total2 = 700;
+const stakers = [
+	{ name: 'A', stake: 500, x: '16.667%' },
+	{ name: 'B', stake: 300, x: '50%', leaves: true },
+	{ name: 'C', stake: 200, x: '83.333%' },
+].map((s) => {
+	const share1 = s.stake / total1;
+	const share2 = s.leaves ? 0 : s.stake / total2;
+	return { ...s, share1, share2, earned1: share1, earned2: share1 + share2 };
+});
+---
+
+<figure class="viz not-content sk">
+	<div class="viz-loop" aria-hidden="true">
+		<div class="sk-top">
+			<span class="sk-fee">Fee for stakers: <b>$1.00</b></span>
+		</div>
+		<div class="sk-wires">
+			<span class="sk-hwire"></span>
+			{stakers.map((s) => <span class={`sk-vwire sk-${s.name}`} style={`left:${s.x}`} />)}
+			{stakers.map((s) => <b class={`sk-dot ${s.leaves ? 'sk-once' : ''}`} style={`--x:${s.x}`} />)}
+		</div>
+		<div class="sk-boxes">
+			{stakers.map((s) => (
+				<div class={`sk-box sk-${s.name}`}>
+					<span class="sk-name">Staker {s.name}</span>
+					<span class="sk-k">Staked</span>
+					<span class="sk-v">
+						{s.leaves ? (
+							<>
+								<span style="--w:sk-w-0-31">{s.stake}</span>
+								<span class="sk-final" style="--w:sk-w-31-100">0</span>
+							</>
+						) : (
+							<span class="sk-final">{s.stake}</span>
+						)}
+					</span>
+					<span class="sk-k">Share</span>
+					<span class="sk-v">
+						<span style="--w:sk-w-0-33">{pct(s.share1)}</span>
+						<span class="sk-final" style="--w:sk-w-33-100">{pct(s.share2)}</span>
+					</span>
+					<span class="sk-bar"><b style={`--s1:${s.share1};--s2:${s.share2}`} /></span>
+					<span class="sk-k">Earned</span>
+					<span class="sk-v sk-usd">
+						<span style="--w:sk-w-0-21">$0.00</span>
+						{s.leaves ? (
+							<>
+								<span style="--w:sk-w-21-78">{money(s.earned1)}</span>
+								<span class="sk-final" style="--w:sk-w-78-100">$0.00</span>
+							</>
+						) : (
+							<>
+								<span style="--w:sk-w-21-67">{money(s.earned1)}</span>
+								<span class="sk-final" style="--w:sk-w-67-100">{money(s.earned2)}</span>
+							</>
+						)}
+					</span>
+					<span class="sk-tags">
+						<span class="sk-plus sk-plus1">+{money(s.share1)}</span>
+						{!s.leaves && <span class="sk-plus sk-plus2">+{money(s.share2)}</span>}
+						{s.leaves && <span class="sk-note sk-kept">Unstaked, rewards kept</span>}
+						{s.leaves && <span class="sk-note sk-claimed">Claimed {money(s.earned1)}</span>}
+					</span>
+				</div>
+			))}
+		</div>
+	</div>
+	<ul class="viz-says">
+		<li data-s="1"><b>A fee arrives.</b> It's split by stake at that moment. A has half of all staked BASKET, so A earns half.</li>
+		<li data-s="2"><b>B unstakes.</b> There's no lockup. B's $0.30 stays in B's position, and A and C now hold all the stake.</li>
+		<li data-s="3"><b>The next fee</b> goes to A and C only, by their new shares.</li>
+		<li data-s="4"><b>B claims</b> the $0.30 in USDC. Rewards can be claimed at any time, even with nothing staked.</li>
+	</ul>
+</figure>
+
+<style>
+	.sk {
+		--t: 16s;
+	}
+	.sk-top {
+		display: flex;
+		justify-content: center;
+	}
+	.sk-fee {
+		padding: 0.3rem 0.7rem;
+		border: 1px solid var(--viz-usdc);
+		border-radius: 999px;
+		background: var(--viz-usdc-soft);
+		color: #2f4a69;
+		white-space: nowrap;
+	}
+	.sk-fee b {
+		font-weight: 600;
+	}
+
+	/* Wires from the fee to each staker, as in the fee diagram. */
+	.sk-wires {
+		position: relative;
+		height: 2.25rem;
+		margin-top: 0.4rem;
+	}
+	.sk-hwire {
+		position: absolute;
+		left: 16.667%;
+		right: 16.667%;
+		top: 0.9rem;
+		height: 2px;
+		background: var(--viz-line);
+	}
+	.sk-hwire::before {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: -0.9rem;
+		width: 2px;
+		height: 0.9rem;
+		background: var(--viz-line);
+	}
+	.sk-vwire {
+		position: absolute;
+		top: 0.9rem;
+		bottom: 0;
+		width: 2px;
+		margin-left: -1px;
+		background: var(--viz-line);
+	}
+	.sk-dot {
+		position: absolute;
+		left: var(--x);
+		top: 100%;
+		width: 0.6rem;
+		height: 0.6rem;
+		margin: -0.3rem 0 0 -0.3rem;
+		border-radius: 50%;
+		background: var(--viz-usdc);
+		opacity: 0;
+	}
+
+	.sk-boxes {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 0.6rem;
+	}
+	.sk-box {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		align-items: baseline;
+		align-content: start;
+		gap: 0.3rem 0.5rem;
+		padding: 0.65rem 0.7rem;
+		border: 1px solid var(--viz-line);
+		border-radius: 5px;
+		background: var(--viz-card);
+		min-width: 0;
+	}
+	.sk-name {
+		grid-column: 1 / -1;
+		font-weight: 600;
+		margin-bottom: 0.1rem;
+	}
+	.sk-k {
+		font-size: 0.72rem;
+		color: var(--viz-muted);
+	}
+	/* Values that change take turns in one spot; --w names each one's window. */
+	.sk-v {
+		display: grid;
+		justify-items: end;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+	.sk-v > span {
+		grid-area: 1 / 1;
+		white-space: nowrap;
+		opacity: 0;
+	}
+	.sk-v > .sk-final {
+		opacity: 1;
+	}
+	.sk-usd {
+		color: #2f4a69;
+		font-size: 1.05rem;
+	}
+	.sk-bar {
+		grid-column: 1 / -1;
+		height: 0.35rem;
+		border-radius: 999px;
+		background: var(--viz-line-soft);
+		overflow: hidden;
+	}
+	.sk-bar b {
+		display: block;
+		height: 100%;
+		background: var(--viz-copper);
+		border-radius: 999px;
+		transform-origin: left;
+		transform: scaleX(var(--s2));
+	}
+	.sk-tags {
+		grid-column: 1 / -1;
+		display: grid;
+		justify-items: start;
+		min-height: 1.3rem;
+	}
+	.sk-tags > span {
+		grid-area: 1 / 1;
+		padding: 0.08rem 0.45rem;
+		border-radius: 999px;
+		font-size: 0.7rem;
+		font-weight: 600;
+		white-space: nowrap;
+		opacity: 0;
+	}
+	.sk-plus {
+		background: var(--viz-usdc-soft);
+		color: #2f4a69;
+	}
+	.sk-note {
+		background: var(--viz-copper-soft);
+		color: var(--viz-copper);
+	}
+	.sk-tags > .sk-claimed {
+		opacity: 1;
+	}
+	@media (max-width: 34rem) {
+		.sk-boxes {
+			gap: 0.35rem;
+		}
+		.sk-box {
+			grid-template-columns: 1fr;
+			padding: 0.55rem 0.5rem;
+			gap: 0.1rem;
+		}
+		.sk-v {
+			justify-items: start;
+			margin-bottom: 0.25rem;
+		}
+		.sk-bar {
+			margin-bottom: 0.3rem;
+		}
+		.sk-tags > span {
+			white-space: normal;
+		}
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		[data-s='1'] { animation: sk-s1 var(--t) infinite both; }
+		[data-s='2'] { animation: sk-s2 var(--t) infinite both; }
+		[data-s='3'] { animation: sk-s3 var(--t) infinite both; }
+		[data-s='4'] { animation: sk-s4 var(--t) infinite both; }
+
+		.sk-fee {
+			animation: sk-fee var(--t) infinite both;
+		}
+		.sk-dot {
+			animation: sk-dot var(--t) infinite both;
+		}
+		.sk-dot.sk-once {
+			animation-name: sk-dot-once;
+		}
+		.sk-vwire.sk-B {
+			animation: sk-fade var(--t) infinite both;
+		}
+		.sk-v > span[style] {
+			animation: var(--w) var(--t) infinite both;
+		}
+		.sk-bar b {
+			animation: sk-share var(--t) infinite both;
+		}
+		.sk-plus1 { animation: sk-plus1 var(--t) infinite both; }
+		.sk-plus2 { animation: sk-plus2 var(--t) infinite both; }
+		.sk-kept { animation: sk-kept var(--t) infinite both; }
+		.sk-tags > .sk-claimed { animation: sk-claimed var(--t) infinite both; }
+		.sk-box.sk-B {
+			animation: sk-box-b var(--t) infinite both;
+		}
+	}
+
+	/* Fee 1 at 4-21%, B unstakes at 31%, fee 2 at 50-67%, B claims at 78%. */
+	@keyframes sk-s1 {
+		0% { --viz-on: 0; }
+		2%, 28% { --viz-on: 1; }
+		30%, 100% { --viz-on: 0; }
+	}
+	@keyframes sk-s2 {
+		0%, 28% { --viz-on: 0; }
+		30%, 48% { --viz-on: 1; }
+		50%, 100% { --viz-on: 0; }
+	}
+	@keyframes sk-s3 {
+		0%, 48% { --viz-on: 0; }
+		50%, 74% { --viz-on: 1; }
+		76%, 100% { --viz-on: 0; }
+	}
+	@keyframes sk-s4 {
+		0%, 74% { --viz-on: 0; }
+		76%, 97% { --viz-on: 1; }
+		100% { --viz-on: 0; }
+	}
+	@keyframes sk-fee {
+		0%, 3% { opacity: 0.4; transform: scale(1); }
+		6% { opacity: 1; transform: scale(1.08); }
+		9%, 20% { opacity: 1; transform: scale(1); }
+		26%, 49% { opacity: 0.4; transform: scale(1); }
+		52% { opacity: 1; transform: scale(1.08); }
+		55%, 66% { opacity: 1; transform: scale(1); }
+		72%, 100% { opacity: 0.4; transform: scale(1); }
+	}
+	/* Down from the fee, along the top wire to the staker, then down into the box. */
+	@keyframes sk-dot {
+		0%, 8% { left: 50%; top: 0; opacity: 0; }
+		9% { left: 50%; top: 0.9rem; opacity: 1; }
+		14% { left: var(--x); top: 0.9rem; opacity: 1; }
+		20% { left: var(--x); top: 100%; opacity: 1; }
+		21%, 54% { left: var(--x); top: 100%; opacity: 0; }
+		55% { left: 50%; top: 0.9rem; opacity: 1; }
+		60% { left: var(--x); top: 0.9rem; opacity: 1; }
+		66% { left: var(--x); top: 100%; opacity: 1; }
+		67%, 100% { left: var(--x); top: 100%; opacity: 0; }
+	}
+	@keyframes sk-dot-once {
+		0%, 8% { left: 50%; top: 0; opacity: 0; }
+		9% { left: 50%; top: 0.9rem; opacity: 1; }
+		14% { left: var(--x); top: 0.9rem; opacity: 1; }
+		20% { left: var(--x); top: 100%; opacity: 1; }
+		21%, 100% { left: var(--x); top: 100%; opacity: 0; }
+	}
+	@keyframes sk-fade {
+		0%, 31% { opacity: 1; }
+		34%, 100% { opacity: 0.25; }
+	}
+	@keyframes sk-box-b {
+		0%, 31% { border-color: var(--viz-line); }
+		34%, 100% { border-color: var(--viz-copper-soft); }
+	}
+	@keyframes sk-share {
+		0%, 32% { transform: scaleX(var(--s1)); }
+		36%, 100% { transform: scaleX(var(--s2)); }
+	}
+
+	/* Windows for values that take turns: sk-w-A-B shows from A% to B% of the loop. */
+	@keyframes sk-w-0-21 {
+		0%, 20% { opacity: 1; }
+		22%, 100% { opacity: 0; }
+	}
+	@keyframes sk-w-21-67 {
+		0%, 20% { opacity: 0; }
+		22%, 66% { opacity: 1; }
+		68%, 100% { opacity: 0; }
+	}
+	@keyframes sk-w-67-100 {
+		0%, 66% { opacity: 0; }
+		68%, 100% { opacity: 1; }
+	}
+	@keyframes sk-w-21-78 {
+		0%, 20% { opacity: 0; }
+		22%, 77% { opacity: 1; }
+		79%, 100% { opacity: 0; }
+	}
+	@keyframes sk-w-78-100 {
+		0%, 77% { opacity: 0; }
+		79%, 100% { opacity: 1; }
+	}
+	@keyframes sk-w-0-31 {
+		0%, 30% { opacity: 1; }
+		32%, 100% { opacity: 0; }
+	}
+	@keyframes sk-w-31-100 {
+		0%, 30% { opacity: 0; }
+		32%, 100% { opacity: 1; }
+	}
+	@keyframes sk-w-0-33 {
+		0%, 32% { opacity: 1; }
+		34%, 100% { opacity: 0; }
+	}
+	@keyframes sk-w-33-100 {
+		0%, 32% { opacity: 0; }
+		34%, 100% { opacity: 1; }
+	}
+
+	@keyframes sk-plus1 {
+		0%, 19% { opacity: 0; transform: translateY(0.3rem); }
+		22%, 28% { opacity: 1; transform: none; }
+		32%, 100% { opacity: 0; transform: none; }
+	}
+	@keyframes sk-plus2 {
+		0%, 65% { opacity: 0; transform: translateY(0.3rem); }
+		68%, 76% { opacity: 1; transform: none; }
+		80%, 100% { opacity: 0; transform: none; }
+	}
+	@keyframes sk-kept {
+		0%, 31% { opacity: 0; }
+		34%, 77% { opacity: 1; }
+		79%, 100% { opacity: 0; }
+	}
+	@keyframes sk-claimed {
+		0%, 77% { opacity: 0; }
+		79%, 100% { opacity: 1; }
+	}
+</style>

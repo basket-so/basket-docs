@@ -1,0 +1,224 @@
+---
+// Why each basket token's backing doesn't change: mints and redeems move the reserves in
+// proportion to supply. Each band is 100 tokens' share of a vault; supply numbers are made up.
+const vaults = [
+	{ symbol: 'SOL', c: '#3f6b4f' },
+	{ symbol: 'JTO', c: '#86a37f' },
+	{ symbol: 'JUP', c: '#d29a6e' },
+	{ symbol: 'PYTH', c: '#b8754a' },
+];
+---
+
+<figure class="viz not-content bk">
+	<div class="bk-stage viz-loop" aria-hidden="true">
+		<div class="bk-vaults">
+			<span class="viz-kicker">Vault reserves</span>
+			<div class="bk-cols">
+				{vaults.map((v) => (
+					<span class="bk-col">
+						<span class="bk-fill" style={`--c:${v.c}`} />
+						<em>{v.symbol}</em>
+					</span>
+				))}
+			</div>
+		</div>
+		<div class="bk-supply">
+			<span class="viz-kicker">Basket token supply</span>
+			<span class="bk-nums">
+				<span class="bk-n1">1,000</span>
+				<span class="bk-n2">1,500</span>
+				<span class="bk-n3">750</span>
+			</span>
+			<span class="bk-tags">
+				<span class="bk-tag bk-mint">+500 minted</span>
+				<span class="bk-tag bk-redeem">−750 redeemed</span>
+			</span>
+			<span class="bk-key"><i></i>One band = 100 tokens' share</span>
+		</div>
+	</div>
+	<ul class="viz-says">
+		<li data-s="1"><b>1,000 tokens.</b> Each band backs 100 basket tokens, so each vault holds 10 bands.</li>
+		<li data-s="2"><b>A mint of 500</b> adds 50% to supply, so it must deposit 50% more of every token. The bands stay the same size.</li>
+		<li data-s="3"><b>A redeem of 750</b> burns half the supply and takes out half of every vault.</li>
+		<li data-s="4"><b>Supply moves, backing doesn't.</b> Each token is still worth the same share of every vault.</li>
+	</ul>
+</figure>
+
+<style>
+	.bk {
+		--t: 12s;
+		--band: 0.4rem;
+	}
+	.bk-stage {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 1rem 1.5rem;
+	}
+	.bk-vaults {
+		display: grid;
+		gap: 0.45rem;
+	}
+	.bk-cols {
+		display: flex;
+		align-items: flex-end;
+		gap: 0.6rem;
+		height: calc(var(--band) * 15 + 1.2rem);
+		padding: 0 0.6rem;
+		border-bottom: 2px solid var(--viz-line);
+	}
+	.bk-col {
+		display: grid;
+		justify-items: center;
+		gap: 0.25rem;
+	}
+	/* Bands are drawn from the bottom, a fixed size; only the column's height moves. */
+	.bk-fill {
+		width: 2.2rem;
+		height: calc(var(--band) * 10);
+		background: repeating-linear-gradient(
+			to top,
+			var(--c) 0 calc(var(--band) - 2px),
+			transparent calc(var(--band) - 2px) var(--band)
+		);
+	}
+	.bk-col em {
+		font-style: normal;
+		font-size: 0.66rem;
+		font-weight: 600;
+		color: var(--viz-muted);
+	}
+
+	.bk-supply {
+		display: grid;
+		gap: 0.35rem;
+		min-width: 11rem;
+	}
+	.bk-nums {
+		display: grid;
+		font-size: 1.9rem;
+		font-weight: 600;
+		letter-spacing: -0.03em;
+		line-height: 1;
+		font-variant-numeric: tabular-nums;
+	}
+	.bk-nums > span,
+	.bk-tags > span {
+		grid-area: 1 / 1;
+	}
+	.bk-n2,
+	.bk-n3 {
+		opacity: 0;
+	}
+	.bk-tags {
+		display: grid;
+		justify-items: start;
+		min-height: 1.3rem;
+	}
+	.bk-tag {
+		padding: 0.1rem 0.5rem;
+		border-radius: 999px;
+		font-size: 0.72rem;
+		font-weight: 600;
+		white-space: nowrap;
+		opacity: 0;
+	}
+	.bk-mint {
+		background: var(--viz-green-soft);
+		color: var(--viz-green);
+	}
+	.bk-redeem {
+		background: var(--viz-copper-soft);
+		color: var(--viz-copper);
+	}
+	.bk-key {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.72rem;
+		color: var(--viz-muted);
+	}
+	.bk-key i {
+		width: 1rem;
+		height: calc(var(--band) - 2px);
+		background: var(--viz-ink-2);
+	}
+	@media (max-width: 30rem) {
+		.bk {
+			--band: 0.32rem;
+		}
+		.bk-fill {
+			width: 1.6rem;
+		}
+		.bk-cols {
+			gap: 0.4rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		[data-s='1'] { animation: bk-s1 var(--t) infinite both; }
+		[data-s='2'] { animation: bk-s2 var(--t) infinite both; }
+		[data-s='3'] { animation: bk-s3 var(--t) infinite both; }
+		[data-s='4'] { animation: bk-s4 var(--t) infinite both; }
+
+		.bk-fill {
+			animation: bk-fill var(--t) infinite both;
+		}
+		.bk-n1 { animation: bk-n1 var(--t) infinite both; }
+		.bk-n2 { animation: bk-n2 var(--t) infinite both; }
+		.bk-n3 { animation: bk-n3 var(--t) infinite both; }
+		.bk-mint { animation: bk-mint var(--t) infinite both; }
+		.bk-redeem { animation: bk-redeem var(--t) infinite both; }
+	}
+
+	@keyframes bk-s1 {
+		0% { --viz-on: 0; }
+		2%, 16% { --viz-on: 1; }
+		18%, 100% { --viz-on: 0; }
+	}
+	@keyframes bk-s2 {
+		0%, 16% { --viz-on: 0; }
+		18%, 42% { --viz-on: 1; }
+		44%, 100% { --viz-on: 0; }
+	}
+	@keyframes bk-s3 {
+		0%, 42% { --viz-on: 0; }
+		44%, 70% { --viz-on: 1; }
+		72%, 100% { --viz-on: 0; }
+	}
+	@keyframes bk-s4 {
+		0%, 70% { --viz-on: 0; }
+		72%, 97% { --viz-on: 1; }
+		100% { --viz-on: 0; }
+	}
+	/* 10 bands → 15 (mint 500) → 7.5 (redeem 750). */
+	@keyframes bk-fill {
+		0%, 20% { height: calc(var(--band) * 10); }
+		32%, 48% { height: calc(var(--band) * 15); }
+		60%, 100% { height: calc(var(--band) * 7.5); }
+	}
+	@keyframes bk-n1 {
+		0%, 25% { opacity: 1; }
+		27%, 100% { opacity: 0; }
+	}
+	@keyframes bk-n2 {
+		0%, 25% { opacity: 0; }
+		27%, 53% { opacity: 1; }
+		55%, 100% { opacity: 0; }
+	}
+	@keyframes bk-n3 {
+		0%, 53% { opacity: 0; }
+		55%, 100% { opacity: 1; }
+	}
+	@keyframes bk-mint {
+		0%, 17% { opacity: 0; }
+		20%, 42% { opacity: 1; }
+		45%, 100% { opacity: 0; }
+	}
+	@keyframes bk-redeem {
+		0%, 45% { opacity: 0; }
+		48%, 70% { opacity: 1; }
+		73%, 100% { opacity: 0; }
+	}
+</style>

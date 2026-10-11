@@ -1,0 +1,72 @@
+---
+title: How it works
+description: The on-chain design of Basket, from vaults and component pages to multi-step mints, redeems and rebalances.
+---
+
+import Backing from '../../../components/diagrams/Backing.astro';
+
+Basket is a single Solana program, built with Anchor. Every basket is a set of accounts owned by that program. This page covers those accounts, then how a mint, a redeem and a rebalance move tokens.
+
+## A basket's accounts
+
+- **Index state.** The basket's settings: its name and symbol, its kind (fixed units or fixed weights), its fees and fee recipients, its pause switches, its keeper, and counters for operations in progress.
+- **Basket token mint.** A standard SPL token. Its mint authority is a program address, so only the program can mint basket tokens, and only against deposits.
+- **Vault authority.** A program address that owns every vault and the basket token mint. No private key can sign for it.
+- **Vaults.** One token account per component, holding everything that backs the basket.
+- **Component pages.** The list of components, ten per page. For each token the page records its mint, its token program, its vault, its target weight and how much of it the basket's books hold.
+
+Up to 40 tokens fit in one basket.
+
+### What backs each token
+
+For each component the program keeps an **accounted reserve**. This is the amount of that token that the program's books say backs the supply. One basket token is worth `reserve ÷ supply` of every component.
+
+The first mint into an empty basket uses the basket's configured **units per basket token** instead. This sets the basket's starting composition. After that, every mint and redeem is proportional to the reserves. Mints round up in the basket's favor, and redeems round down. Tokens that someone sends straight to a vault don't change the books. In a fixed-weight basket, the next rebalance records them as backing for all holders.
+
+<Backing />
+
+## Mints and redeems are multi-step
+
+Buying or selling every component needs one swap per token. With many tokens that doesn't fit in one Solana transaction. Instead, the program splits a mint or redeem into steps and tracks them with an **intent**, an on-chain record of the operation.
+
+**Mint**
+
+1. **Open** the intent. The program records how much of each token is needed, the fee rates, your spending limit and an expiry of up to 30 minutes. The app uses 20.
+2. **Fill** each component, in batches. A fill is a Jupiter swap from your USDC straight into the vault. The program checks that the vault received at least what was needed, and books any extra as backing.
+3. **Collect** the fee in USDC, on top of what the swaps spent.
+4. **Finalize.** The program checks the total spent against your limit and mints your basket tokens.
+
+**Redeem**
+
+1. **Open** the intent. The program burns your basket tokens and sets aside your share of each component.
+2. **Fill** each component, in batches. A fill sells your share from the vault and sends you the USDC, minus that leg's fee. The last fill completes the redeem.
+
+The program can also mint and redeem **in kind**, moving the component tokens themselves instead of swapping. The app interface doesn't expose this feature.
+
+### Operations don't block each other
+
+- Each user can have one open operation per basket at a time. Different users' operations run side by side.
+- Anyone can cancel an operation that has expired. The tokens it had moved go back to the owner, either to their wallet or to a **refund escrow** they claim from. Nobody can keep an operation, or the basket, stuck.
+- A mint that opens into an empty basket belongs to a new **supply era**. This stops it from settling against a basket that has since refilled with different contents.
+
+## Rebalances
+
+Rebalances run in a separate intent. Only the authority or the keeper can open one, and only when no mints or redeems are in progress. While one is open, no new mints or redeems start. [Rebalancing](/baskets/rebalancing/) covers the triggers, the oracle and the limits.
+
+## Fees and staking
+
+Fees are charged in USDC on the swaps a mint or redeem makes. They're split between the protocol treasury, an optional creator and a USDC reward vault for BASKET stakers. Staking keeps a running reward-per-token total, so each staker earns in proportion to their stake while they hold it. See [Fees](/protocol/fees/) and [Stake BASKET](/guides/staking/).
+
+## Address lookup tables
+
+Each basket has an address lookup table holding its accounts. The app and the keeper use it to fit a basket's many accounts into Solana's 1,232-byte, 64-account transaction limits.
+
+## Off-chain parts
+
+The program is the source of truth, but three services help it run:
+
+- **The app** builds the Jupiter routes and transactions for mints and redeems. It also records each basket's NAV every 15 minutes for its charts.
+- **The keeper** watches fixed-weight baskets, runs rebalances, and settles expired operations into the refund escrow.
+- **The price oracle** signs prices for rebalances. It's a private service with its own key. See [Price oracle](/protocol/oracle/).
+
+None of them can move tokens out of a basket's vaults except through the program's rules.

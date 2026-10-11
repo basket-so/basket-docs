@@ -1,0 +1,268 @@
+---
+// A price's path from the market to a rebalance: probed, cross-checked, signed by the
+// oracle, then checked again by the program in the transaction that uses it.
+---
+
+<figure class="viz not-content oc">
+	<ol class="oc-steps viz-loop" aria-hidden="true">
+		<li data-s="1">
+			<span class="oc-num">1</span>
+			<span class="oc-title">Probe</span>
+			<span class="oc-trip">
+				<span class="oc-tok oc-usdc">USDC</span>
+				<span class="oc-path"><b></b></span>
+				<span class="oc-tok">JUP</span>
+			</span>
+			<span class="oc-text">$50 round trip through Jupiter. The price is the midpoint.</span>
+		</li>
+		<li data-s="2">
+			<span class="oc-num">2</span>
+			<span class="oc-title">Cross-check</span>
+			<span class="oc-checks">
+				<span class="oc-check oc-c1">Jupiter price API</span>
+				<span class="oc-check oc-c2">DexScreener</span>
+			</span>
+			<span class="oc-text">Every reference agrees within 3%.</span>
+		</li>
+		<li data-s="3">
+			<span class="oc-num">3</span>
+			<span class="oc-title">Sign</span>
+			<span class="oc-seal"><span>Signed</span></span>
+			<span class="oc-text">The oracle's own key signs the prices, for this one rebalance only.</span>
+		</li>
+		<li data-s="4">
+			<span class="oc-num">4</span>
+			<span class="oc-title">Program checks</span>
+			<span class="oc-checks">
+				<span class="oc-check oc-c3">Oracle's signature</span>
+				<span class="oc-check oc-c4">This rebalance</span>
+				<span class="oc-check oc-c5">≤ 50 slots old</span>
+			</span>
+			<span class="oc-text">Checked in the same transaction that trades on the price.</span>
+		</li>
+	</ol>
+	<figcaption class="viz-caption">
+		If any token fails step 1 or 2, the oracle signs nothing for that basket. If a price fails step 4, the program rejects it. Either way, the basket waits to rebalance. Mints and redeems never use these prices.
+	</figcaption>
+</figure>
+
+<style>
+	.oc {
+		--t: 12s;
+	}
+	.oc-steps {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 0.6rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	@media (max-width: 42rem) {
+		.oc-steps {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+	.oc-steps > li {
+		display: grid;
+		grid-template-rows: auto auto 1fr auto;
+		gap: 0.45rem;
+		margin: 0;
+		padding: 0.7rem;
+		border: 1px solid var(--viz-line);
+		border-radius: 5px;
+		background: var(--viz-card);
+		min-width: 0;
+	}
+	.oc-num {
+		display: grid;
+		place-items: center;
+		width: 1.3rem;
+		height: 1.3rem;
+		border-radius: 50%;
+		background: var(--viz-line-soft);
+		font-size: 0.7rem;
+		font-weight: 600;
+	}
+	.oc-title {
+		font-weight: 600;
+	}
+	.oc-text {
+		font-size: 0.74rem;
+		line-height: 1.35;
+		color: var(--viz-muted);
+	}
+
+	/* 1: a dot runs USDC → token → USDC. */
+	.oc-trip {
+		display: flex;
+		align-items: center;
+		gap: 0.3rem;
+		align-self: center;
+	}
+	.oc-tok {
+		padding: 0.1rem 0.35rem;
+		border-radius: 3px;
+		background: var(--viz-green-soft);
+		color: var(--viz-green);
+		font-size: 0.68rem;
+		font-weight: 600;
+	}
+	.oc-usdc {
+		background: var(--viz-usdc-soft);
+		color: #2f4a69;
+	}
+	.oc-path {
+		position: relative;
+		flex: 1;
+		height: 2px;
+		min-width: 1.2rem;
+		background: var(--viz-line);
+	}
+	.oc-path b {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 0.5rem;
+		height: 0.5rem;
+		margin: -0.25rem 0 0 -0.25rem;
+		border-radius: 50%;
+		background: var(--viz-copper);
+	}
+
+	/* 2 and 4: checks that tick on in turn. */
+	.oc-checks {
+		display: grid;
+		gap: 0.25rem;
+		align-content: center;
+	}
+	.oc-check {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.72rem;
+		font-weight: 500;
+	}
+	.oc-check::before {
+		content: '✓';
+		display: grid;
+		place-items: center;
+		width: 0.95rem;
+		height: 0.95rem;
+		flex-shrink: 0;
+		border-radius: 50%;
+		background: var(--viz-green);
+		color: #fff;
+		font-size: 0.6rem;
+		font-weight: 700;
+	}
+
+	/* 3: the signature seal. */
+	.oc-seal {
+		display: grid;
+		place-items: center;
+		align-self: center;
+		justify-self: start;
+		width: 3.2rem;
+		height: 3.2rem;
+		border: 2px solid var(--viz-copper);
+		border-radius: 50%;
+		color: var(--viz-copper);
+		font-size: 0.66rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		transform: rotate(-12deg);
+	}
+	.oc-seal span {
+		display: grid;
+		place-items: center;
+		width: 2.6rem;
+		height: 2.6rem;
+		border: 1px dashed var(--viz-copper);
+		border-radius: 50%;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.oc-steps > li {
+			border-color: color-mix(in srgb, var(--viz-copper) calc(var(--viz-on) * 100%), var(--viz-line));
+			box-shadow: 0 0 0 calc(var(--viz-on) * 2px) var(--viz-copper-soft);
+		}
+		.oc-num {
+			background: color-mix(in srgb, var(--viz-copper) calc(var(--viz-on) * 100%), var(--viz-line-soft));
+			color: color-mix(in srgb, #fff calc(var(--viz-on) * 100%), var(--viz-ink));
+		}
+		[data-s='1'] { animation: oc-s1 var(--t) infinite both; }
+		[data-s='2'] { animation: oc-s2 var(--t) infinite both; }
+		[data-s='3'] { animation: oc-s3 var(--t) infinite both; }
+		[data-s='4'] { animation: oc-s4 var(--t) infinite both; }
+
+		.oc-path b {
+			animation: oc-trip var(--t) linear infinite both;
+		}
+		.oc-c1 { animation: oc-c1 var(--t) infinite both; }
+		.oc-c2 { animation: oc-c2 var(--t) infinite both; }
+		.oc-seal { animation: oc-seal var(--t) infinite both; }
+		.oc-c3 { animation: oc-c3 var(--t) infinite both; }
+		.oc-c4 { animation: oc-c4 var(--t) infinite both; }
+		.oc-c5 { animation: oc-c5 var(--t) infinite both; }
+	}
+
+	/* Each step's highlight stays on a little once done, so the trail stays readable. */
+	@keyframes oc-s1 {
+		0% { --viz-on: 0; }
+		2%, 22% { --viz-on: 1; }
+		26%, 100% { --viz-on: 0; }
+	}
+	@keyframes oc-s2 {
+		0%, 22% { --viz-on: 0; }
+		26%, 44% { --viz-on: 1; }
+		48%, 100% { --viz-on: 0; }
+	}
+	@keyframes oc-s3 {
+		0%, 44% { --viz-on: 0; }
+		48%, 62% { --viz-on: 1; }
+		66%, 100% { --viz-on: 0; }
+	}
+	@keyframes oc-s4 {
+		0%, 62% { --viz-on: 0; }
+		66%, 94% { --viz-on: 1; }
+		98%, 100% { --viz-on: 0; }
+	}
+	/* Out to the token and back, twice. */
+	@keyframes oc-trip {
+		0%, 3% { left: 0; opacity: 0; }
+		4% { left: 0; opacity: 1; }
+		8% { left: 100%; }
+		12% { left: 0; }
+		16% { left: 100%; }
+		20% { left: 0; opacity: 1; }
+		22% { left: 50%; opacity: 1; }
+		100% { left: 50%; opacity: 1; }
+	}
+	@keyframes oc-c1 {
+		0%, 29% { opacity: 0; transform: translateX(-0.25rem); }
+		32%, 100% { opacity: 1; transform: none; }
+	}
+	@keyframes oc-c2 {
+		0%, 36% { opacity: 0; transform: translateX(-0.25rem); }
+		39%, 100% { opacity: 1; transform: none; }
+	}
+	@keyframes oc-seal {
+		0%, 50% { opacity: 0; transform: rotate(-12deg) scale(1.6); }
+		55% { opacity: 1; transform: rotate(-12deg) scale(0.95); }
+		58%, 100% { opacity: 1; transform: rotate(-12deg) scale(1); }
+	}
+	@keyframes oc-c3 {
+		0%, 69% { opacity: 0; transform: translateX(-0.25rem); }
+		72%, 100% { opacity: 1; transform: none; }
+	}
+	@keyframes oc-c4 {
+		0%, 75% { opacity: 0; transform: translateX(-0.25rem); }
+		78%, 100% { opacity: 1; transform: none; }
+	}
+	@keyframes oc-c5 {
+		0%, 81% { opacity: 0; transform: translateX(-0.25rem); }
+		84%, 100% { opacity: 1; transform: none; }
+	}
+</style>

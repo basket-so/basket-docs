@@ -1,0 +1,59 @@
+---
+title: Rebalancing
+description: How fixed-weight baskets are brought back to their targets, and the limits the program enforces.
+---
+
+import DriftTrigger from '../../../components/diagrams/DriftTrigger.astro';
+
+Fixed-weight baskets drift away from their target weights as prices move. Rebalancing trades them back. It sells the tokens that are over target and uses the USDC to buy the ones that are under.
+
+## When a basket rebalances
+
+A rebalance can only open when one of these is true:
+
+- **Time:** the basket's rebalance interval has passed since its last rebalance. Every basket uses 30 days so far.
+- **Drift:** any one token's weight is at least the drift threshold away from its target, measured in percentage points. Every basket uses 5 points so far. For example, a token targeting 20% triggers a rebalance at 15% or 25%.
+- **Composition change:** a [composition change](/baskets/composition-changes/) was just applied, so the holdings no longer match the new targets.
+
+<DriftTrigger />
+
+## Who rebalances
+
+Only the basket's authority or its appointed **keeper** can rebalance. Basket runs a keeper bot that watches every fixed-weight basket and rebalances when a trigger fires. The keeper is a separate wallet from the basket's authority. The program limits what it can do.
+
+## How a rebalance runs
+
+1. **Request.** The keeper asks the basket to hold new mints and redeems so the ones in progress can finish. A request lapses after 40 minutes, and the next one has to wait another 20. This means requests alone can hold mints and redeems back for at most 40 minutes of any hour.
+2. **Open.** Once no mints or redeems are in progress, the keeper opens the rebalance. The program reads the basket's value from **signed oracle prices** and works out how much of each token to sell or buy.
+3. **Trade.** The keeper swaps through Jupiter, a few tokens per transaction. Each trade is checked against the signed price in the same transaction. A sale must sell exactly its amount and receive at least a minimum. A purchase can't pay more than the oracle value plus a slippage limit of at most 5%.
+4. **Finalize.** The program checks the result against its limits, then records the new holdings and reopens mints and redeems.
+
+## The limits
+
+At finalize, the rebalance has to meet all of these, or it can't complete:
+
+- **Every trade done and checked.**
+- **Back near target.** Every token must end within a drift bound that the keeper chooses at open. The bound is between 0.25 and 5 percentage points, and always below the basket's drift trigger, so a finished rebalance doesn't immediately trigger another.
+- **Limited value loss.** At the same prices, the basket's value after trading can't be more than a tolerance below its value before. The keeper chooses the tolerance at open, and the program only accepts values between 0.1% and 1%. Basket's keeper uses 0.5%.
+- **No idle cash.** USDC left over from the trades must be under 1% of the basket's value.
+
+Each trade's own price check is the tighter protection. The overall value-loss limit is a backstop on top of it.
+
+Oracle prices must be fresh: at most 50 Solana slots old, which is about 20 seconds. A price that has moved more than 15% from the price signed earlier in the same rebalance is refused. See [Price oracle](/protocol/oracle/).
+
+## If a rebalance can't finish
+
+- Before any trade, the keeper can **cancel** it.
+- At any point, the basket's authority can **unwind** it. Once it has expired, anyone can. Unwinding doesn't undo the trades. It records whatever the vaults now hold as the basket's backing and reopens mints and redeems.
+
+A rebalance expires at most 30 minutes after it opens.
+
+## What holders see
+
+- While a rebalance runs, new mints and redeems wait. The app says the basket is rebalancing, and nothing is charged.
+- Your basket tokens stay in your wallet and remain fully transferable. Staking is unaffected.
+- After the rebalance, NAV reflects the new holdings. Trading costs come out of the basket, within the limits above.
+
+## Fixed-units baskets
+
+Fixed-units baskets never rebalance. Their token quantities are fixed for good.

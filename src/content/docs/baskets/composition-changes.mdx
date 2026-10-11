@@ -1,0 +1,34 @@
+---
+title: Composition changes
+description: How a fixed-weight basket's tokens and weights can change, and the notice holders get.
+---
+
+import CompositionTimeline from '../../../components/diagrams/CompositionTimeline.astro';
+
+A fixed-weight basket's tokens and target weights can change over time. A token can be added or removed, or the weights adjusted. Every change is announced on-chain and can't take effect for **three days**. This gives holders who don't want the new mix time to redeem first.
+
+Fixed-units baskets can't change their composition.
+
+## The timeline
+
+1. **Proposed.** The basket's authority proposes the new set of weights. Only one change can be pending per basket. The app shows a banner on the basket's page with the change and when it takes effect.
+2. **Notice period: 3 days.** The change can't be applied before then.
+3. **Apply window: 7 days.** After the notice period, the change can be applied within seven days. If it isn't, it lapses and has to be proposed again.
+4. **Rebalance.** Applying a change sets the new targets. Added tokens start empty, so the basket is immediately due for a [rebalance](/baskets/rebalancing/) that moves it to the new weights.
+
+The authority can cancel a pending change at any time.
+
+<CompositionTimeline />
+
+## Protections for holders
+
+- **Exits stay open.** Nobody can pause redeems, so holders who don't want the new mix can always redeem during the notice.
+- **No fee hike behind the change.** A change can't be applied if the basket's total redeem fee is higher than when the change was proposed. Changing the redeem fee also restarts the notice.
+- **No surprises mid-operation.** A change applies only when no mints, redeems or rebalances are in progress.
+
+## Limits on a change
+
+- A change can add at most 10 tokens, and the basket can't exceed 20 tokens in total.
+- Every token kept or added needs a weight of at least 0.5%. To remove a token, give it a weight of 0.
+- The weights must sum to 100%, and the change has to actually change something.
+- The USDC slot's weight can't change. Tokens added by a change must be classic SPL tokens.

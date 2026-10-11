@@ -1,0 +1,34 @@
+---
+title: Stake BASKET
+description: Stake the BASKET token to earn a share of mint and redeem fees, paid in USDC.
+---
+
+import StakingRewards from '../../../components/diagrams/StakingRewards.astro';
+
+BASKET is Basket's protocol token. Staking it earns you a share of the fees people pay to mint and redeem baskets, paid in **USDC**.
+
+## How rewards work
+
+Each basket's fee is split into a treasury share, a staker share and sometimes a creator share. On most baskets today the fee is 0.10%, and half of it goes to stakers. That's 0.05% of every mint and redeem. [Fees](/protocol/fees/) lists every basket's split.
+
+The staker share is paid into a USDC reward vault as each mint or redeem completes. It's divided among stakers in proportion to how much BASKET each one has staked at that moment. If no one is staked when a fee arrives, it's held and paid out to stakers at the next distribution.
+
+There is **no lockup**. You can unstake at any time, and you keep the rewards you've earned.
+
+<StakingRewards />
+
+## In the app
+
+Open **Stake** from the top bar.
+
+- **Reward APR** is the last 30 days of USDC rewards, annualized, divided by the USD value of all staked BASKET. It changes with mint and redeem activity, so it's a record of the past, not a promise.
+- **Your position** shows your stake, your share of the pool, your unclaimed rewards and a **Claim USDC** button.
+- **Rewards history** charts cumulative rewards over 30 days, 90 days or all time, with your estimated daily rewards.
+- **Stake / Unstake** shows your projected rewards and new share of the pool before you confirm.
+
+## Good to know
+
+- Rewards are paid in USDC, not BASKET.
+- Unstaking doesn't pay out your rewards. They're saved to your position. You collect them with **Claim USDC**, even after you've unstaked everything.
+- Anyone can also send USDC to stakers directly through the program's reward-funding instruction.
+- BASKET's mint address is on the [Addresses](/protocol/addresses/) page.

@@ -1,0 +1,90 @@
+/* Basket's palette and type on Starlight (tokens from basket-ui/styles.css).
+   The docs are light-only: ThemeProvider pins data-theme="light", and these unlayered
+   values override Starlight's built-in palette. One typeface, DM Sans, for everything. */
+
+:root {
+	color-scheme: light;
+
+	--sl-font: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+	--sl-font-mono: var(--sl-font);
+
+	/* The app's cream paper, green ink and copper links. */
+	--sl-color-accent-low: #efe2d6;
+	--sl-color-accent: #775338;
+	--sl-color-accent-high: #4a3322;
+	--sl-color-white: #242b25;
+	--sl-color-gray-1: #2f3830;
+	--sl-color-gray-2: #414c41;
+	--sl-color-gray-3: #6c756a;
+	--sl-color-gray-4: #9aa394;
+	--sl-color-gray-5: #d1d5ca;
+	--sl-color-gray-6: #e6e8df;
+	--sl-color-gray-7: #f0f0e9;
+	--sl-color-black: #f7f7f1;
+	--sl-color-bg-nav: #f7f7f1;
+	--sl-color-bg-sidebar: #f7f7f1;
+	--sl-color-hairline-light: #e1e4da;
+	--sl-color-hairline: #d1d5ca;
+
+	/* Asides in the brand colours: notes (Starlight's blue) in green, tips (purple) in copper. */
+	--sl-color-blue-low: #e3ebdd;
+	--sl-color-blue: #5f8a68;
+	--sl-color-blue-high: #2c4a37;
+	--sl-color-purple-low: #f1e4d8;
+	--sl-color-purple: #b8754a;
+	--sl-color-purple-high: #5c3f29;
+
+	/* Square-ish corners like the app. */
+	--sl-card-radius: 4px;
+}
+
+/* The site title, set like the app's header. */
+.site-title {
+	font-size: 1.3rem;
+	font-weight: 600;
+	letter-spacing: -0.03em;
+	gap: 0.6rem;
+}
+.site-title img {
+	height: 1.75rem;
+	width: auto;
+}
+
+/* Headings: the app's tight DM Sans. */
+.sl-markdown-content :is(h1, h2, h3, h4),
+h1#_top {
+	font-weight: 500;
+	letter-spacing: -0.02em;
+}
+h1#_top {
+	letter-spacing: -0.03em;
+}
+
+/* Splash hero. */
+.hero h1 {
+	font-weight: 500;
+	letter-spacing: -0.04em;
+	line-height: 1.02;
+}
+.hero .tagline {
+	max-width: 34rem;
+}
+
+/* Cards in the brand accent rather than Starlight's rotating rainbow. */
+body .card.card {
+	--sl-card-border: var(--sl-color-accent);
+	--sl-card-bg: var(--sl-color-accent-low);
+}
+
+.sl-markdown-content table {
+	font-variant-numeric: tabular-nums;
+}
+.sl-markdown-content code:not(pre code) {
+	overflow-wrap: anywhere;
+}
+/* Code is set in DM Sans too; keep it a touch smaller than the prose, with even digits. */
+code,
+kbd,
+pre {
+	font-variant-numeric: tabular-nums;
+}

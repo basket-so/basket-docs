@@ -1,0 +1,185 @@
+/* Shared pieces for the animated diagrams in src/components/diagrams/.
+   Each diagram's base styles draw a complete, static picture. Motion is added only under
+   prefers-reduced-motion: no-preference, so readers who turn animation off still get
+   the whole diagram. Every animation in a diagram runs on one loop of length --t. */
+
+.viz {
+	--viz-ink: #242b25;
+	--viz-ink-2: #414c41;
+	--viz-muted: #6c756a;
+	--viz-faint: #9aa394;
+	--viz-line: #d1d5ca;
+	--viz-line-soft: #e6e8df;
+	--viz-paper: #fcfcf8;
+	--viz-card: #ffffff;
+	--viz-copper: #775338;
+	--viz-copper-mid: #b8754a;
+	--viz-copper-soft: #f1e4d8;
+	--viz-green: #3f6b4f;
+	--viz-green-mid: #86a37f;
+	--viz-green-soft: #e3ebdd;
+	--viz-usdc: #4f6f94;
+	--viz-usdc-soft: #e1e8f0;
+	--viz-alert: #a3462a;
+	--viz-alert-soft: #f5e1d9;
+	--t: 10s;
+
+	margin: 2rem 0;
+	padding: 1.25rem 1.25rem 1rem;
+	border: 1px solid var(--viz-line);
+	border-radius: 6px;
+	background: var(--viz-paper);
+	color: var(--viz-ink);
+	font-size: 0.85rem;
+	line-height: 1.35;
+	overflow: hidden;
+}
+.viz * {
+	box-sizing: border-box;
+}
+@media (max-width: 30rem) {
+	.viz {
+		padding: 1rem 0.85rem 0.85rem;
+		font-size: 0.8rem;
+	}
+}
+
+/* Small uppercase label. */
+.viz-kicker {
+	font-size: 0.66rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--viz-muted);
+}
+
+/* A token: a coloured dot and its symbol. */
+.viz-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.18rem 0.55rem 0.18rem 0.3rem;
+	border: 1px solid var(--viz-line);
+	border-radius: 999px;
+	background: var(--viz-card);
+	font-weight: 500;
+	font-size: 0.78rem;
+	white-space: nowrap;
+}
+.viz-chip i {
+	width: 0.7rem;
+	height: 0.7rem;
+	border-radius: 50%;
+	background: var(--c, var(--viz-green));
+	flex-shrink: 0;
+}
+
+/* The basket token itself: a copper coin. */
+.viz-coin {
+	display: inline-grid;
+	place-items: center;
+	width: 3.6rem;
+	height: 3.6rem;
+	border-radius: 50%;
+	background: var(--viz-copper);
+	color: #fbf3ea;
+	font-weight: 600;
+	font-size: 0.8rem;
+	letter-spacing: 0.02em;
+	box-shadow: inset 0 0 0 3px #8f6646, 0 2px 6px rgba(60, 40, 20, 0.18);
+}
+
+/* Steps along the top of a diagram: one lights up at a time. */
+.viz-rail {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	margin: 0 0 1.1rem;
+	padding: 0;
+	list-style: none;
+}
+.viz-rail li {
+	margin: 0;
+	padding: 0.25rem 0.6rem;
+	border: 1px solid var(--viz-line);
+	border-radius: 999px;
+	background: var(--viz-card);
+	color: var(--viz-muted);
+	font-size: 0.75rem;
+	font-weight: 500;
+	white-space: nowrap;
+}
+.viz-rail li b {
+	font-weight: 600;
+	color: var(--viz-ink);
+	margin-right: 0.25rem;
+}
+
+/* Narration under a diagram. Without motion it's a list of every step; with motion the
+   lines share one spot and take turns. */
+.viz-says {
+	display: grid;
+	gap: 0.35rem;
+	margin: 1rem 0 0;
+	padding: 0;
+	list-style: none;
+	color: var(--viz-ink-2);
+}
+.viz-says li {
+	margin: 0;
+}
+.viz-says b {
+	font-weight: 600;
+	color: var(--viz-ink);
+}
+
+.viz-caption {
+	margin: 1rem 0 0;
+	padding-top: 0.8rem;
+	border-top: 1px solid var(--viz-line-soft);
+	color: var(--viz-muted);
+	font-size: 0.85rem;
+	line-height: 1.5;
+}
+.viz-caption b {
+	color: var(--viz-ink);
+	font-weight: 600;
+}
+
+/* --viz-on drives a step's highlight: a diagram animates it between 0 and 1 on the rail
+   pill and narration line of the same step (matched by data-s). Registered so it eases. */
+@property --viz-on {
+	syntax: '<number>';
+	inherits: true;
+	initial-value: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+	.viz-says li {
+		grid-area: 1 / 1;
+		opacity: var(--viz-on);
+		transform: translateY(calc((1 - var(--viz-on)) * 0.25rem));
+	}
+	.viz-rail li {
+		border-color: color-mix(in srgb, var(--viz-copper) calc(var(--viz-on) * 100%), var(--viz-line));
+		background: color-mix(in srgb, var(--viz-copper-soft) calc(var(--viz-on) * 100%), var(--viz-card));
+		color: color-mix(in srgb, var(--viz-ink) calc(var(--viz-on) * 100%), var(--viz-muted));
+	}
+	/* The whole picture fades out at the end of each loop and back in at the start, so
+	   every part can snap back to its first frame unseen. */
+	.viz-loop {
+		animation: viz-loop var(--t) infinite both;
+	}
+}
+@keyframes viz-loop {
+	0% { opacity: 0; }
+	2%, 95% { opacity: 1; }
+	99%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.viz *,
+	.viz *::before,
+	.viz *::after {
+		animation: none !important;
+		transition: none !important;
+	}
+}

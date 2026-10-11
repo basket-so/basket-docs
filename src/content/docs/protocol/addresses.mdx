@@ -1,0 +1,61 @@
+---
+title: Addresses
+description: Program, token and account addresses for Basket on Solana mainnet.
+---
+
+import data from '../../../data/baskets.json';
+
+All addresses are on Solana mainnet. Check them on [Solscan](https://solscan.io) before you interact directly.
+
+## Protocol
+
+| | Address |
+|---|---|
+| Basket program | <code>{data.programId}</code> |
+| BASKET token | <code>{data.basketMint}</code> |
+| Protocol config | <code>{data.protocolConfig}</code> |
+| Staking pool | <code>{data.stakingPool}</code> |
+| USDC (quote and reward token) | <code>{data.usdcMint}</code> |
+| Jupiter v6 (swap routing) | `JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4` |
+
+## Baskets
+
+Each basket has an **index account**, which holds its settings, and a **token mint**, which is the basket token itself.
+
+<table>
+	<thead>
+		<tr><th>Basket</th><th>Token mint</th><th>Index account</th></tr>
+	</thead>
+	<tbody>
+		{data.baskets.map((b) => (
+			<tr>
+				<td><a href={`/baskets/live-baskets/#${b.symbol.toLowerCase()}`}>{b.symbol}</a></td>
+				<td><code>{b.mint}</code></td>
+				<td><code>{b.index}</code></td>
+			</tr>
+		))}
+	</tbody>
+</table>
+
+## Program-derived addresses
+
+For integrators, these are the seeds the program uses to derive its accounts. `u8` and `u64` values are little-endian bytes.
+
+| Account | Seeds |
+|---|---|
+| Protocol config | `"protocol-config"` |
+| Staking pool | `"staking-pool"` |
+| Staking vault authority | `"staking-authority"` |
+| Stake position | `"stake-position"`, pool, owner |
+| Price oracle | `"price-oracle"` |
+| Index (basket) | `"index"`, authority, symbol |
+| Basket token mint | `"index-mint"`, index |
+| Vault authority | `"vault-authority"`, index |
+| Component page | `"large-basket-component-page"`, index, page index (`u8`) |
+| Mint or redeem intent | `"large-basket-intent"`, index, owner, nonce (`u64`) |
+| Intent lock | `"large-basket-intent-lock"`, index, owner |
+| Refund escrow | `"refund-escrow"`, index |
+| Rebalance intent | `"rebalance-intent"`, index, nonce (`u64`) |
+| Composition change | `"composition-change"`, index |
+
+Component vaults are the vault authority's associated token accounts for each component mint, under that token's own program.

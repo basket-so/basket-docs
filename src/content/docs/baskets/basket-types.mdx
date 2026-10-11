@@ -1,0 +1,47 @@
+---
+title: Fixed units and fixed weights
+description: The two kinds of basket, and how each one behaves as prices move.
+---
+
+import UnitsVsWeights from '../../../components/diagrams/UnitsVsWeights.astro';
+
+Every basket is one of two kinds. The kind is set when the basket is created and never changes.
+
+## Fixed units
+
+A fixed-units basket holds **a set quantity of each token** per basket token, for example 0.0026 SOL, 0.3 JTO and 0.4 JUP. Those quantities never change.
+
+- Its weights drift with prices. If one token doubles while the others stay flat, that token becomes a bigger share of the basket, exactly as if you held the tokens yourself.
+- It never trades on its own. The only swaps are the ones people make when they mint and redeem.
+- It needs no oracle or keeper.
+
+Fixed units suits themes where you want to hold the tokens as they are and let winners run, such as a memecoin basket or an ecosystem basket like METADAO.
+
+## Fixed weights
+
+A fixed-weights basket aims for **target percentages**, for example 50% JUP, 30% RAY and 20% ORCA.
+
+- As prices move, the actual weights drift away from their targets.
+- A keeper **rebalances** the basket back to target on a schedule, or sooner if any token's weight is 5 percentage points off target. Every basket so far uses a 30-day schedule. Rebalancing sells what has grown and buys what has shrunk.
+- Rebalancing trades against signed oracle prices. The program limits how much value a rebalance can lose. See [Rebalancing](/baskets/rebalancing/).
+- Its tokens can change over time through a [composition change](/baskets/composition-changes/). Holders get three days' notice.
+
+Fixed weights suits themes where you want a steady mix, such as a liquid-staking basket split across providers, or a basket that keeps a fixed share in USDC.
+
+Every fixed-weight basket also holds a **USDC slot**. Rebalances route their trades through USDC, and USDC left over between trades sits there. The slot's target is usually 0%, but a basket can also give USDC a real weight. SOLC gives it 40%.
+
+<UnitsVsWeights />
+
+## Side by side
+
+| | Fixed units | Fixed weights |
+|---|---|---|
+| What stays constant | Token quantities | Target percentages |
+| Weights over time | Drift with prices | Drift, then rebalanced back |
+| Trades on its own | Never | When rebalanced |
+| Needs an oracle | No | Yes, for rebalances |
+| Can change components | No | Yes, with 3 days' notice |
+
+## How NAV is calculated
+
+For both kinds, a basket token's NAV is its share of the vaults. For each component, take the amount the basket holds per basket token and multiply it by that token's current price. NAV is the sum of these. Mints and redeems after the first are proportional to what's in the vaults, so NAV is the same for every holder.

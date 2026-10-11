@@ -1,0 +1,302 @@
+---
+// An interrupted mint over time: tokens bought so far stay set aside, the mint can be
+// continued for 20 minutes, and after that it is unwound to the owner. Here the keeper
+// settles it into the refund escrow and the owner claims.
+const ramp = ['#3f6b4f', '#5f8a68', '#86a37f'];
+// Six empty slots per box; the three bought tokens sit in the first three.
+const slots = Array.from({ length: 6 });
+---
+
+<figure class="viz not-content rt">
+	<div class="viz-loop" aria-hidden="true">
+		<div class="rt-time">
+			<div class="rt-zones">
+				<span class="rt-zone rt-cont">Can continue</span>
+				<span class="rt-zone rt-rec"><span class="rt-long">Can recover</span><span class="rt-short">Recover</span></span>
+			</div>
+			<div class="rt-track">
+				<span class="rt-mark rt-open" style="left:0%">Open</span>
+				<span class="rt-mark rt-closed" style="left:16%">Tab closed</span>
+				<span class="rt-cursor"></span>
+			</div>
+			<div class="rt-scale">
+				<span style="left:0%">0</span>
+				<span style="left:40%">10 min</span>
+				<span style="left:80%"><b>20 min: expires</b></span>
+			</div>
+		</div>
+
+		<div class="rt-row">
+			<div class="rt-box">
+				<span class="rt-slots">{slots.map(() => <i />)}</span>
+				<span class="viz-kicker">Set aside for you</span>
+				<span class="rt-sub">3 of 6 tokens bought</span>
+			</div>
+			<div class="rt-box">
+				<span class="rt-slots">{slots.map(() => <i />)}</span>
+				<span class="viz-kicker">Refund escrow</span>
+				<span class="rt-sub rt-claim">Claim tokens</span>
+			</div>
+			<div class="rt-box">
+				<span class="rt-slots">{slots.map(() => <i />)}</span>
+				<span class="viz-kicker">Your wallet</span>
+				<span class="rt-sub">Yours to keep or sell</span>
+			</div>
+			{ramp.map((c, i) => <b class="rt-dot" style={`--c:${c};--k:${i};--d:${i * 0.02}`} />)}
+		</div>
+	</div>
+	<ul class="viz-says">
+		<li data-s="1"><b>0 min.</b> A mint opens and its first swaps buy 3 of the basket's 6 tokens into the vaults.</li>
+		<li data-s="2"><b>Interrupted.</b> You close the tab. The tokens bought stay set aside for you, and <b>Continue mint</b> picks up where you left off for 20 minutes.</li>
+		<li data-s="3"><b>Expired.</b> Anyone can now unwind it. Basket's keeper does, and your tokens go to your refund escrow.</li>
+		<li data-s="4"><b>Claim.</b> Only you can move them to your wallet. If you cancel the mint yourself first, they go straight to your wallet.</li>
+	</ul>
+</figure>
+
+<style>
+	.rt {
+		--t: 14s;
+		--slot: 0.8rem;
+		--gap: 0.6rem;
+	}
+	.rt-zones {
+		position: relative;
+		display: flex;
+		height: 1.4rem;
+		margin-bottom: 0.3rem;
+		font-size: 0.7rem;
+		font-weight: 600;
+	}
+	.rt-zone {
+		display: flex;
+		align-items: center;
+		padding: 0 0.45rem;
+		border-radius: 3px;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+	.rt-cont {
+		width: 80%;
+		background: var(--viz-green-soft);
+		color: var(--viz-green);
+	}
+	.rt-rec {
+		width: 20%;
+		margin-left: 2px;
+		background: var(--viz-copper-soft);
+		color: var(--viz-copper);
+	}
+	.rt-short {
+		display: none;
+	}
+	.rt-track {
+		position: relative;
+		height: 1.6rem;
+		border-bottom: 2px solid var(--viz-line);
+	}
+	.rt-track::after {
+		content: '';
+		position: absolute;
+		left: 80%;
+		bottom: -0.45rem;
+		height: 2.3rem;
+		border-left: 2px dashed var(--viz-copper);
+	}
+	.rt-mark {
+		position: absolute;
+		bottom: 0.25rem;
+		font-size: 0.7rem;
+		font-weight: 600;
+		white-space: nowrap;
+	}
+	.rt-closed {
+		color: var(--viz-alert);
+		transform: translateX(-50%);
+	}
+	.rt-closed::before {
+		content: '✕ ';
+	}
+	.rt-cursor {
+		position: absolute;
+		left: 92%;
+		bottom: -0.45rem;
+		width: 0.8rem;
+		height: 0.8rem;
+		margin-left: -0.4rem;
+		border-radius: 50%;
+		background: var(--viz-ink);
+		border: 2px solid var(--viz-paper);
+	}
+	.rt-scale {
+		position: relative;
+		height: 1.1rem;
+		margin-top: 0.5rem;
+		font-size: 0.68rem;
+		color: var(--viz-muted);
+	}
+	.rt-scale span {
+		position: absolute;
+		white-space: nowrap;
+	}
+	.rt-scale span:nth-child(2),
+	.rt-scale span:nth-child(3) {
+		transform: translateX(-50%);
+	}
+	.rt-scale b {
+		color: var(--viz-copper);
+		font-weight: 600;
+	}
+
+	/* Where the bought tokens are: three boxes, with dots that move between them. */
+	.rt-row {
+		position: relative;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--gap);
+		margin-top: 1rem;
+	}
+	.rt-box {
+		display: grid;
+		justify-items: center;
+		gap: 0.5rem;
+		padding: 0.6rem 0.4rem;
+		border: 1px solid var(--viz-line);
+		border-radius: 5px;
+		background: var(--viz-card);
+		text-align: center;
+		min-width: 0;
+	}
+	.rt-slots {
+		display: flex;
+		gap: 0.25rem;
+		height: var(--slot);
+		margin-bottom: 0.15rem;
+	}
+	.rt-slots i {
+		width: var(--slot);
+		height: var(--slot);
+		border-radius: 50%;
+		border: 1px dashed var(--viz-faint);
+	}
+	.rt-sub {
+		font-size: 0.7rem;
+		color: var(--viz-muted);
+	}
+	.rt-claim {
+		padding: 0.1rem 0.5rem;
+		border-radius: 999px;
+		background: var(--viz-copper);
+		color: #fbf3ea;
+		font-weight: 600;
+	}
+	/* Lined up with the slots, which sit at the top of every box: --o is slot k's left edge
+	   relative to the middle of a row of six. With a gap between them, the outer boxes'
+	   middles sit a third of a gap outside the sixths. */
+	.rt-dot {
+		--o: calc(var(--k) * (var(--slot) + 0.25rem) - 3 * var(--slot) - 0.625rem);
+		position: absolute;
+		top: calc(0.6rem + 1px);
+		left: calc(83.333% + var(--gap) / 3 + var(--o));
+		width: var(--slot);
+		height: var(--slot);
+		border-radius: 50%;
+		background: var(--c);
+	}
+	@media (max-width: 30rem) {
+		.rt {
+			--slot: 0.6rem;
+			--gap: 0.35rem;
+		}
+		.rt-long,
+		.rt-open {
+			display: none;
+		}
+		.rt-short {
+			display: inline;
+		}
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		[data-s='1'] { animation: rt-s1 var(--t) infinite both; }
+		[data-s='2'] { animation: rt-s2 var(--t) infinite both; }
+		[data-s='3'] { animation: rt-s3 var(--t) infinite both; }
+		[data-s='4'] { animation: rt-s4 var(--t) infinite both; }
+
+		.rt-cursor {
+			animation: rt-cursor var(--t) linear infinite both;
+		}
+		.rt-closed {
+			animation: rt-closed var(--t) infinite both;
+		}
+		.rt-cont {
+			animation: rt-cont var(--t) infinite both;
+		}
+		.rt-rec {
+			animation: rt-rec var(--t) infinite both;
+		}
+		.rt-dot {
+			animation: rt-dot var(--t) infinite both;
+			animation-delay: calc(var(--d) * var(--t));
+		}
+		.rt-claim {
+			animation: rt-claim var(--t) infinite both;
+		}
+	}
+
+	@keyframes rt-s1 {
+		0% { --viz-on: 0; }
+		2%, 15% { --viz-on: 1; }
+		17%, 100% { --viz-on: 0; }
+	}
+	@keyframes rt-s2 {
+		0%, 15% { --viz-on: 0; }
+		17%, 49% { --viz-on: 1; }
+		51%, 100% { --viz-on: 0; }
+	}
+	@keyframes rt-s3 {
+		0%, 49% { --viz-on: 0; }
+		51%, 69% { --viz-on: 1; }
+		71%, 100% { --viz-on: 0; }
+	}
+	@keyframes rt-s4 {
+		0%, 69% { --viz-on: 0; }
+		71%, 97% { --viz-on: 1; }
+		100% { --viz-on: 0; }
+	}
+	/* Minutes run 0 → 25 across the track; expiry at 20 min is 80%. */
+	@keyframes rt-cursor {
+		0% { left: 0%; }
+		16% { left: 16%; }
+		50% { left: 80%; }
+		90%, 100% { left: 96%; }
+	}
+	@keyframes rt-closed {
+		0%, 15% { opacity: 0; }
+		17%, 100% { opacity: 1; }
+	}
+	@keyframes rt-cont {
+		0%, 49% { opacity: 1; }
+		52%, 100% { opacity: 0.45; }
+	}
+	@keyframes rt-rec {
+		0%, 49% { opacity: 0.45; }
+		52%, 100% { opacity: 1; }
+	}
+	/* Bought into the vaults, settled to the escrow by the keeper, claimed to the wallet. */
+	@keyframes rt-dot {
+		0%, 4% { left: calc(16.667% - var(--gap) / 3 + var(--o)); opacity: 0; transform: scale(0.4); }
+		8% { left: calc(16.667% - var(--gap) / 3 + var(--o)); opacity: 1; transform: scale(1); }
+		54% { left: calc(16.667% - var(--gap) / 3 + var(--o)); }
+		62% { left: calc(50% + var(--o)); }
+		74% { left: calc(50% + var(--o)); }
+		82%, 100% { left: calc(83.333% + var(--gap) / 3 + var(--o)); opacity: 1; transform: scale(1); }
+	}
+	@keyframes rt-claim {
+		0%, 64% { opacity: 0; transform: scale(1); }
+		67% { opacity: 1; transform: scale(1); }
+		71% { transform: scale(0.92); }
+		73% { transform: scale(1); }
+		82% { opacity: 1; }
+		86%, 100% { opacity: 0.35; }
+	}
+</style>

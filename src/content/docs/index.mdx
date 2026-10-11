@@ -1,0 +1,46 @@
+---
+title: Basket
+description: Basket turns a set of Solana tokens into one token you can mint and redeem with USDC.
+template: splash
+hero:
+  title: One token for a whole theme.
+  tagline: Basket holds a set of Solana tokens in on-chain vaults and gives you one token for all of them. Mint it with USDC, hold it in any wallet, and redeem it for USDC whenever you want.
+  actions:
+    - text: What is Basket
+      link: /start/what-is-basket/
+      icon: right-arrow
+    - text: Open the app
+      link: https://app.basketsolana.xyz
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import data from '../../data/baskets.json';
+import BasketConcept from '../../components/diagrams/BasketConcept.astro';
+
+<BasketConcept />
+
+<CardGrid>
+	<Card title="Fully backed" icon="seti:lock">
+		Every basket token is a claim on tokens held in program-owned vaults on Solana. Redeem it and you get your share, sold for USDC.
+	</Card>
+	<Card title="Mint and redeem with USDC" icon="random">
+		The app swaps your USDC into every token in the basket through Jupiter, then mints. Redeeming does the reverse.
+	</Card>
+	<Card title="Weights held on target" icon="setting">
+		Fixed-weight baskets are rebalanced using signed oracle prices, within limits the program enforces.
+	</Card>
+	<Card title="Earn from the fees" icon="star">
+		Stake BASKET to earn a share of mint and redeem fees, paid in USDC. There is no lockup.
+	</Card>
+</CardGrid>
+
+## Where to start
+
+<CardGrid>
+	<LinkCard title="Quickstart" description="Mint your first basket in a few minutes." href="/start/quickstart/" />
+	<LinkCard title={`Live baskets (${data.baskets.length})`} description="What each basket holds, its weights and fees." href="/baskets/live-baskets/" />
+	<LinkCard title="How it works" description="Vaults, multi-step mints and redeems, rebalancing and the oracle." href="/protocol/how-it-works/" />
+	<LinkCard title="Risks" description="What can go wrong, and what the protocol does about it." href="/resources/risks/" />
+</CardGrid>

@@ -1,0 +1,14 @@
+---
+title: Live baskets
+description: Every basket live on Basket, what it holds, its weights, fee and token address.
+tableOfContents: false
+---
+
+import BasketList from '../../../components/BasketList.astro';
+import data from '../../../data/baskets.json';
+
+There are {data.baskets.length} baskets live today. Each one is a separate token with its own vaults. For **fixed-weight** baskets the percentages below are targets that rebalancing returns to. For **fixed-unit** baskets they're the weights at launch. The token quantities never change, so the weights move with prices. The app shows each basket's current weights.
+
+Fixed-weight baskets also keep a small USDC slot that rebalancing routes through. It's left out below unless USDC is one of the basket's targets.
+
+<BasketList />

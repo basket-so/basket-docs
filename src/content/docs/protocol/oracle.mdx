@@ -1,0 +1,45 @@
+---
+title: Price oracle
+description: How rebalances get prices, and the checks those prices pass.
+---
+
+import OracleCheck from '../../../components/diagrams/OracleCheck.astro';
+
+Rebalancing a fixed-weight basket means knowing what each token is worth. Basket uses its own **pull oracle**. An off-chain service prices the tokens and signs the prices. The program checks the signature in the same transaction that uses them.
+
+Mints and redeems don't use the oracle at all. They're priced by the swaps themselves and bounded by your own limits.
+
+<OracleCheck />
+
+## Where prices come from
+
+For each token, the oracle:
+
+1. **Probes a real round trip.** It quotes a $50 swap from USDC into the token and back through Jupiter, and uses the midpoint as the price.
+2. **Rejects bad markets.** If the round trip loses more than 4%, or gains money, the token isn't priced.
+3. **Checks references.** It compares the price with Jupiter's price API (if that has updated within the last hour) and the most liquid DexScreener pair. Every available reference must agree within 3%, and at least one must be available.
+
+If any token in a basket fails these checks, the oracle won't sign for that basket. The basket doesn't rebalance until the oracle can sign for it.
+
+## How the program checks a price
+
+- **Signed by the oracle's key.** The program stores the oracle's public key and accepts only prices signed by it. The key belongs to the oracle alone. It's separate from the keeper and from any basket's authority.
+- **Signed for this rebalance.** Each signed message names the specific rebalance it's for, so it can't be reused in another one.
+- **Fresh.** Prices must be at most 50 Solana slots old, about 20 seconds.
+- **In the right place.** The signature check must come immediately before the step that uses the prices, in the same transaction.
+- **USDC is always $1.**
+
+## What the oracle service refuses
+
+- It signs only for fixed-weight baskets, and only for tokens the basket actually holds.
+- It refuses a price that moved more than 15% from the first price it signed for the same rebalance, or from its last price for that token within 15 minutes.
+- It refuses to sign if pricing took longer than half the freshness window.
+- It signs at most 120 times an hour.
+
+The service runs privately. Only Basket's keeper can request signatures.
+
+## What a bad price could do
+
+The oracle only affects rebalances. Mints, redeems and the tokens in your wallet don't depend on it.
+
+The program measures its rebalance limits at the signed prices. It checks each trade against its token's price, and the whole rebalance against a value-loss tolerance of at most 1%. So a wrong price that got past the oracle's checks could still make a rebalance trade at a loss. That's why the oracle refuses thin markets, prices its references disagree with, and sudden large moves. See [Rebalancing](/baskets/rebalancing/).

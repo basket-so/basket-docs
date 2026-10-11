@@ -1,0 +1,212 @@
+---
+// Many tokens in, one token out: each component flows into its own vault, then the basket
+// token appears, backed by all of them. Uses SOLB's components and starting weights.
+import data from '../../data/baskets.json';
+
+const ramp = ['#3f6b4f', '#5f8a68', '#86a37f', '#b3a37f', '#d29a6e', '#b8754a'];
+const basket = data.baskets.find((b) => b.symbol === 'SOLB') ?? data.baskets[0];
+const components = basket.components.slice(0, 6);
+const top = Math.max(...components.map((c) => c.weightBps ?? 1));
+---
+
+<figure class="viz not-content bc">
+	<div class="bc-stage" aria-hidden="true">
+		<span class="viz-kicker bc-head" style="grid-column:1">Tokens</span>
+		<span class="viz-kicker bc-head" style="grid-column:3">Basket vaults</span>
+		<span class="viz-kicker bc-head bc-head-out" style="grid-column:5">You hold</span>
+		<span class="bc-frame" style={`grid-row:2 / span ${components.length}`}></span>
+		{components.map((c, i) => (
+			<>
+				<span class="viz-chip bc-chip" style={`grid-row:${i + 2};--c:${ramp[i]};--i:${i}`}><i />{c.symbol}</span>
+				<span class="bc-lane" style={`grid-row:${i + 2};--c:${ramp[i]};--i:${i}`}><b /></span>
+				<span class="bc-slot" style={`grid-row:${i + 2};--c:${ramp[i]};--i:${i};--w:${(c.weightBps ?? 1) / top}`}><b /></span>
+			</>
+		))}
+		<span class="bc-arrow" style={`grid-row:2 / span ${components.length}`}></span>
+		<span class="bc-out" style={`grid-row:2 / span ${components.length}`}>
+			<span class="viz-coin">{basket.symbol}</span>
+			<span class="bc-out-label">1 basket token</span>
+		</span>
+	</div>
+	<figcaption class="viz-caption">
+		<b>One token, fully backed.</b> Each token in a basket sits in its own program-owned vault. You hold one basket token, a claim on your share of every vault.
+	</figcaption>
+</figure>
+
+<style>
+	.bc {
+		--t: 10s;
+		/* The home page is wider than a docs page; keep the picture at docs width there. */
+		max-width: 44rem;
+		margin-inline: auto;
+	}
+	.bc-stage {
+		display: grid;
+		grid-template-columns: auto minmax(1rem, 1fr) minmax(4.5rem, 9rem) minmax(1.5rem, 1fr) auto;
+		grid-auto-rows: auto;
+		row-gap: 0.4rem;
+		align-items: center;
+	}
+	.bc-head {
+		grid-row: 1;
+		margin-bottom: 0.15rem;
+	}
+	.bc-head-out {
+		justify-self: center;
+	}
+	.bc-chip {
+		grid-column: 1;
+		justify-self: start;
+	}
+
+	/* The path from a token to its vault, and the dot that travels it. */
+	.bc-lane {
+		grid-column: 2;
+		position: relative;
+		height: 2px;
+		margin: 0 0.35rem;
+		background: repeating-linear-gradient(90deg, var(--viz-line) 0 4px, transparent 4px 8px);
+	}
+	.bc-lane b {
+		position: absolute;
+		top: 50%;
+		left: calc(100% - 0.55rem);
+		width: 0.55rem;
+		height: 0.55rem;
+		margin-top: -0.275rem;
+		border-radius: 50%;
+		background: var(--c);
+		opacity: 0;
+	}
+
+	/* The vaults: one frame, one bar per token, sized by its starting weight. */
+	.bc-frame {
+		grid-column: 3;
+		align-self: stretch;
+		margin: -0.45rem 0;
+		border: 1px solid var(--viz-line);
+		border-radius: 5px;
+		background: var(--viz-card);
+	}
+	.bc-slot {
+		grid-column: 3;
+		height: 0.5rem;
+		margin: 0 0.55rem;
+		border-radius: 2px;
+		background: var(--viz-line-soft);
+		overflow: hidden;
+	}
+	.bc-slot b {
+		display: block;
+		height: 100%;
+		width: calc(var(--w) * 100%);
+		min-width: 0.4rem;
+		border-radius: 2px;
+		background: var(--c);
+		transform-origin: left center;
+	}
+
+	/* Vaults to the basket token. */
+	.bc-arrow {
+		grid-column: 4;
+		position: relative;
+		height: 2px;
+		margin: 0 0.4rem;
+		background: var(--viz-copper);
+		transform-origin: left center;
+	}
+	.bc-arrow::after {
+		content: '';
+		position: absolute;
+		right: -1px;
+		top: 50%;
+		width: 0.45rem;
+		height: 0.45rem;
+		border-top: 2px solid var(--viz-copper);
+		border-right: 2px solid var(--viz-copper);
+		transform: translateY(-50%) rotate(45deg);
+	}
+	.bc-out {
+		grid-column: 5;
+		display: grid;
+		justify-items: center;
+		gap: 0.4rem;
+	}
+	.bc-out-label {
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: var(--viz-ink-2);
+		white-space: nowrap;
+	}
+
+	@media (max-width: 30rem) {
+		.bc-stage {
+			grid-template-columns: auto minmax(0.6rem, 1fr) minmax(4rem, 7rem) minmax(1.1rem, 1fr) auto;
+		}
+		.bc-out .viz-coin {
+			width: 3rem;
+			height: 3rem;
+			font-size: 0.72rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.bc-chip,
+		.bc-lane b,
+		.bc-slot b {
+			animation-duration: var(--t);
+			animation-iteration-count: infinite;
+			animation-fill-mode: both;
+			animation-delay: calc(var(--i) * var(--t) * 0.045);
+		}
+		.bc-chip {
+			animation-name: bc-chip;
+		}
+		.bc-lane b {
+			animation-name: bc-dot;
+			animation-timing-function: linear;
+		}
+		.bc-slot b {
+			animation-name: bc-fill;
+		}
+		.bc-arrow {
+			animation: bc-arrow var(--t) infinite both;
+		}
+		.bc-out {
+			animation: bc-out var(--t) infinite both;
+		}
+	}
+
+	/* Per token: the chip lights up, its dot crosses to the vault, the vault fills. The
+	   delay staggers the tokens; the fade at 76-82% clears each one before the next loop. */
+	@keyframes bc-chip {
+		0%, 2% { box-shadow: 0 0 0 0 transparent; }
+		5%, 12% { box-shadow: 0 0 0 2px var(--c); }
+		18%, 100% { box-shadow: 0 0 0 0 transparent; }
+	}
+	@keyframes bc-dot {
+		0%, 3% { left: 0; opacity: 0; }
+		5% { left: 4%; opacity: 1; }
+		15% { left: calc(100% - 0.55rem); opacity: 1; }
+		17%, 100% { left: calc(100% - 0.55rem); opacity: 0; }
+	}
+	@keyframes bc-fill {
+		0%, 14% { transform: scaleX(0); opacity: 1; }
+		21% { transform: scaleX(1); opacity: 1; }
+		76% { transform: scaleX(1); opacity: 1; }
+		82%, 100% { transform: scaleX(1); opacity: 0; }
+	}
+	@keyframes bc-arrow {
+		0%, 44% { transform: scaleX(0); opacity: 1; }
+		50% { transform: scaleX(1); opacity: 1; }
+		76% { transform: scaleX(1); opacity: 1; }
+		82%, 100% { transform: scaleX(1); opacity: 0; }
+	}
+	@keyframes bc-out {
+		0%, 49% { opacity: 0; transform: scale(0.6); }
+		55% { opacity: 1; transform: scale(1.06); }
+		58% { opacity: 1; transform: scale(1); }
+		76% { opacity: 1; transform: scale(1); }
+		82%, 100% { opacity: 0; transform: scale(1); }
+	}
+</style>

@@ -1,0 +1,41 @@
+---
+title: What is Basket
+description: Basket packages a set of Solana tokens into one fully backed token that you mint and redeem with USDC.
+---
+
+import BasketConcept from '../../../components/diagrams/BasketConcept.astro';
+
+Basket is a protocol on Solana for **baskets**: tokens that each stand for a fixed set of other tokens. One basket token might hold SOL, Jito, Jupiter, Pyth, Raydium and Orca. Another holds the tokens of eight protocols that buy back their own token. You hold one token and get exposure to all of them.
+
+Every basket token is **fully backed**. The tokens behind it sit in vaults owned by the Basket program. The program tracks exactly how much of each token every basket token is worth. When you redeem, you get your share of those vaults, sold for USDC.
+
+<BasketConcept />
+
+## What you can do
+
+- **Mint** a basket with USDC. The app buys each token in the basket through Jupiter, deposits them in the basket's vaults, and mints basket tokens to your wallet. See [Mint a basket](/guides/mint/).
+- **Hold** it like any other token. A basket token is a normal SPL token. You can send it, keep it in any Solana wallet, or use it in [Markets](/guides/markets/).
+- **Redeem** it for USDC whenever you like. The program burns your basket tokens, sells your share of each token, and sends you the USDC. See [Redeem a basket](/guides/redeem/).
+- **Stake BASKET**, the protocol token, to earn a share of mint and redeem fees in USDC. See [Stake BASKET](/guides/staking/).
+
+## Two kinds of basket
+
+- **Fixed units** baskets hold a set quantity of each token per basket token and never trade. Their weights drift with prices, like holding the tokens yourself.
+- **Fixed weights** baskets aim for target percentages, such as 50% / 30% / 20%. A keeper rebalances them on a schedule or when a weight drifts too far. It uses signed oracle prices and stays within limits the program enforces.
+
+[Fixed units and fixed weights](/baskets/basket-types/) explains the difference in detail.
+
+## What a basket's price means
+
+Each basket has a **NAV** (net asset value). It is what one basket token's share of the vaults is worth at current market prices. NAV is the price you mint and redeem around, before swap costs and fees. Most baskets started at a NAV of $1. That is a starting point, not a peg.
+
+## Where the value comes from
+
+A basket token is worth exactly what its tokens are worth. It doesn't earn yield on its own. If a component earns value inside the token, the basket gets that. A liquid-staking token whose price rises with staking rewards is one example. If a component's yield must be claimed or staked separately, the basket doesn't get it.
+
+## Next steps
+
+- [Quickstart](/start/quickstart/): mint your first basket.
+- [Live baskets](/baskets/live-baskets/): what each basket holds.
+- [How it works](/protocol/how-it-works/): the on-chain design.
+- [Risks](/resources/risks/): read this before you put money in.

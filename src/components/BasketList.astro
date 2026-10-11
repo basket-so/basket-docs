@@ -1,0 +1,182 @@
+---
+// Every live basket from src/data/baskets.json: what it holds, its weights, fee and addresses.
+import data from '../data/baskets.json';
+
+const pct = (bps: number) => `${(bps / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}%`;
+const short = (address: string) => `${address.slice(0, 4)}…${address.slice(-4)}`;
+// A ramp from the app's green to its copper, one step per component.
+const ramp = ['#3f6b4f', '#5f8a68', '#86a37f', '#b3a37f', '#d29a6e', '#b8754a', '#8e6a52', '#6f8f7f', '#a3896b'];
+---
+
+<div class="basket-list not-content">
+	{data.baskets.map((b) => (
+		<section class="basket" id={b.symbol.toLowerCase()}>
+			<header>
+				<div>
+					<p class="basket-kicker">
+						{b.symbol} · {b.kind === 'fixedWeights' ? 'Fixed weights' : 'Fixed units'}
+						{b.community && <span class="basket-tag">Community proposed</span>}
+					</p>
+					<h3>{b.name}</h3>
+				</div>
+				<a class="basket-open" href={`https://app.basketsolana.xyz/indexes/${b.symbol}`}>Open in app ↗</a>
+			</header>
+			<p class="basket-desc">{b.description}</p>
+			<div class="basket-bar" aria-hidden="true">
+				{b.components.map((c, i) => <span style={`flex:${c.weightBps ?? 1};background:${ramp[i % ramp.length]}`} />)}
+			</div>
+			<ul class="basket-weights">
+				{b.components.map((c, i) => (
+					<li>
+						<i style={`background:${ramp[i % ramp.length]}`} />
+						<b>{c.symbol}</b>
+						<span>{c.weightBps == null ? '' : pct(c.weightBps)}</span>
+					</li>
+				))}
+			</ul>
+			<dl class="basket-meta">
+				<div>
+					<dt>{b.kind === 'fixedWeights' ? 'Target weights' : 'Starting weights'}</dt>
+					<dd>{b.kind === 'fixedWeights'
+						? `Rebalanced every ${b.rebalance?.intervalDays} days, or sooner if a weight is ${(b.rebalance?.driftBps ?? 0) / 100} points off target`
+						: 'Never rebalanced; weights move with prices'}</dd>
+				</div>
+				<div>
+					<dt>Fee</dt>
+					<dd>{b.feeBps.total === 0 ? 'None' : `${pct(b.feeBps.total)} on mint and on redeem`}</dd>
+				</div>
+				<div>
+					<dt>Token mint</dt>
+					<dd><code title={b.mint}>{short(b.mint)}</code></dd>
+				</div>
+			</dl>
+		</section>
+	))}
+</div>
+
+<style>
+	.basket-list {
+		display: grid;
+		gap: 1.25rem;
+		margin-top: 1.5rem;
+	}
+	.basket {
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 4px;
+		padding: 1.25rem 1.25rem 1rem;
+		background: var(--sl-color-black);
+		scroll-margin-top: 5rem;
+	}
+	header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 1rem;
+	}
+	.basket-kicker {
+		margin: 0;
+		font-size: 0.72rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--sl-color-gray-3);
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		align-items: center;
+	}
+	.basket-tag {
+		border: 1px solid var(--sl-color-accent);
+		color: var(--sl-color-accent);
+		border-radius: 3px;
+		padding: 0 0.35rem;
+		letter-spacing: 0.04em;
+	}
+	h3 {
+		margin: 0.2rem 0 0;
+		font-size: 1.35rem;
+		font-weight: 500;
+		letter-spacing: -0.02em;
+		color: var(--sl-color-white);
+	}
+	.basket-open {
+		flex-shrink: 0;
+		font-size: 0.85rem;
+		color: var(--sl-color-accent);
+		text-decoration: none;
+		white-space: nowrap;
+		margin-top: 0.2rem;
+	}
+	.basket-open:hover {
+		text-decoration: underline;
+	}
+	.basket-desc {
+		margin: 0.75rem 0 1rem;
+		color: var(--sl-color-gray-2);
+		font-size: 0.95rem;
+		line-height: 1.55;
+	}
+	.basket-bar {
+		display: flex;
+		height: 8px;
+		gap: 2px;
+		border-radius: 2px;
+		overflow: hidden;
+	}
+	.basket-weights {
+		list-style: none;
+		padding: 0;
+		margin: 0.75rem 0 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 1.1rem;
+		font-size: 0.88rem;
+	}
+	.basket-weights li {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		margin: 0;
+	}
+	.basket-weights i {
+		width: 8px;
+		height: 8px;
+		border-radius: 2px;
+		display: inline-block;
+	}
+	.basket-weights b {
+		font-weight: 500;
+		color: var(--sl-color-white);
+	}
+	.basket-weights span {
+		color: var(--sl-color-gray-3);
+		font-variant-numeric: tabular-nums;
+	}
+	.basket-meta {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+		gap: 0.75rem 1.25rem;
+		margin: 1rem 0 0;
+		padding-top: 0.85rem;
+		border-top: 1px solid var(--sl-color-hairline-light);
+	}
+	.basket-meta div {
+		margin: 0;
+	}
+	dt {
+		font-size: 0.72rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--sl-color-gray-3);
+	}
+	dd {
+		margin: 0.2rem 0 0;
+		font-size: 0.88rem;
+		color: var(--sl-color-gray-1);
+	}
+	@media (max-width: 40rem) {
+		header {
+			flex-direction: column;
+			gap: 0.4rem;
+		}
+	}
+</style>

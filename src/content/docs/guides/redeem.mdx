@@ -1,0 +1,38 @@
+---
+title: Redeem a basket
+description: Turn basket tokens back into USDC.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import RedeemFlow from '../../../components/diagrams/RedeemFlow.astro';
+
+Redeeming burns basket tokens and gives you USDC for your share of every token the basket holds.
+
+## How it works
+
+Switch the panel on a basket's page to **Redeem** and enter how many basket tokens to burn. The app estimates the USDC you'll receive from NAV, minus the redeem fee.
+
+Approve the transactions in order:
+
+1. **Open.** Burns your basket tokens and sets aside your share of each component in the vaults.
+2. **Swaps.** Sells your share of the components for USDC, up to three tokens per transaction. Each swap's share of the fee comes out of its proceeds. The USDC goes straight to your wallet.
+
+The transaction that sells the last component also completes the redeem. There's no separate final step.
+
+<RedeemFlow />
+
+## Price protection
+
+Each swap allows up to 3% slippage. The whole redeem must return at least the estimate minus 6%. If a route would pay out less than that, the transaction fails instead of selling at a bad price. Redeems use wider limits than mints because they sell into whatever liquidity each token has at that moment.
+
+Redeeming a large amount of a basket with thinly traded tokens moves those tokens' prices. Splitting a big redeem into smaller ones over time usually gets a better result.
+
+<Aside title="Interrupted?">
+If you stop partway, the components that haven't been sold yet stay set aside for you. If no swap ran at all, you can cancel and get your basket tokens back. After 20 minutes you can recover the unsold components. See [Finish or recover a mint or redeem](/guides/recover/).
+</Aside>
+
+## Good to know
+
+- **USDC only.** The app always redeems to USDC. The program also supports in-kind redeems, where you receive the component tokens themselves, but the app interface doesn't expose this feature.
+- **Rebalances pause redeems.** While a fixed-weight basket is rebalancing, new redeems wait for it to finish. Your basket tokens stay in your wallet and remain transferable.
+- **Nobody can pause redeems.** Not Basket, and not the basket's authority. Apart from the wait during a rebalance, you can always redeem. See [Security and trust](/protocol/security/).

@@ -1,0 +1,44 @@
+---
+title: Markets
+description: Trade, supply liquidity and borrow against basket tokens in Omnipair pools.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Every basket token can have markets against **USDC** and against **SOL**. They run on [Omnipair](https://omnipair.fi), a protocol whose pools combine a trading pool with lending. You can swap in them, add liquidity, and borrow one side against the other. The **Markets** page lists them all, with the BASKET market always first.
+
+Markets are separate from minting and redeeming. Minting and redeeming always trade at NAV plus the swap costs into each token. A market's price is whatever its pool trades at. When the pool is deep enough, arbitrage keeps that price close to NAV.
+
+## The Markets page
+
+Switch between **USDC pairs** and **SOL pairs**, and between all markets and only yours. Each row shows:
+
+- **Liquidity** across both sides of the pool, or **Create pool** if it doesn't exist yet.
+- **Utilization**: how much of the pool is lent out.
+- **LP APR**: the blended return to liquidity providers.
+- **Borrow APR**: the variable interest rate for each side, charged per slot.
+
+The swap fee and the pool's price half-life appear under each market's name.
+
+## Inside a market
+
+Each market has four tabs. For the BASKET market they're named Trade, Liquidity, Leverage and Manage.
+
+- **Swap.** Trade in the pool directly. Choose slippage of 0.1%, 0.5% or 1%, or set your own. The app shows the price impact, swap fee and minimum received. Above 3% price impact, the app warns that your trade will move the pool price.
+- **Supply.** Deposit both sides at the pool's current ratio to earn LP fees and interest.
+- **Borrow.** Lock either side as collateral and borrow the other. The app previews your health factor, loan-to-value and liquidation point before you confirm. Liquidation starts when health falls to 1.00×. The app won't let you borrow to that point.
+- **Manage.** Withdraw liquidity, repay debt, and add or remove collateral. Withdrawing liquidity includes Omnipair's 1% withdrawal fee.
+
+BASKET's Trade tab routes through Jupiter instead of a single pool. It offers slippage choices of 0.1%, 0.5% or 1%. Above 3% price impact, you have to confirm that you accept it.
+
+## Creating a pool
+
+If a basket doesn't have a pool against USDC or SOL yet, anyone can create one from the Supply tab. It costs a one-time **0.2 SOL** creation fee plus account rent. Creating the pool and making the first deposit happen in one transaction. New pools default to a 0.30% swap fee and a one-hour price half-life. Part of the first deposit is locked in the pool permanently.
+
+<Aside type="caution" title="Set the starting price carefully">
+A new pool starts at whatever ratio its creator deposits. The app fills in the quote side at the basket's current value. It warns you if your starting price is more than 2% away from that value. If you start the pool off-value, arbitrage traders trade it back to value, and the difference comes out of your deposit.
+</Aside>
+
+## Risks
+
+Borrowing can be liquidated if prices move against you. Pool prices, interest rates and utilization change all the time. Liquidity in a basket's pool can be much thinner than the liquidity behind its components. Omnipair is a separate protocol with its own risks. See its own documentation for how its pools and liquidations work.

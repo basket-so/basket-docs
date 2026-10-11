@@ -1,0 +1,217 @@
+---
+// Where one mint's fee goes, using BUYB's live split (the only basket with a creator share).
+import data from '../../data/baskets.json';
+
+const basket = data.baskets.find((b) => b.symbol === 'BUYB') ?? data.baskets[0];
+const { total, protocol, staking, creator } = basket.feeBps;
+const amount = 1000;
+const usd = (bps: number) => `$${((amount * bps) / 10000).toFixed(2)}`;
+const pct = (bps: number) => `${(bps / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}%`;
+const shares = [
+	{ key: 'treasury', name: 'Treasury', bps: protocol, what: 'Basket treasury', x: '16.667%' },
+	{ key: 'stakers', name: 'Stakers', bps: staking, what: 'USDC reward vault for BASKET stakers', x: '50%' },
+	{ key: 'creator', name: 'Creator', bps: creator, what: "The basket's creator fee recipient", x: '83.333%' },
+];
+---
+
+<figure class="viz not-content fs">
+	<div class="fs-stage viz-loop" aria-hidden="true">
+		<div class="fs-top">
+			<span class="fs-mint">Mint <b>${amount.toLocaleString('en-US')}</b> of {basket.symbol}</span>
+			<span class="fs-fee">Fee {pct(total)} = <b>{usd(total)}</b></span>
+		</div>
+		<div class="fs-wires">
+			<span class="fs-hwire"></span>
+			{shares.map((s) => <span class="fs-vwire" style={`left:${s.x}`} />)}
+			{shares.map((s) => <b class="fs-dot" style={`--x:${s.x}`} />)}
+		</div>
+		<div class="fs-boxes">
+			{shares.map((s) => (
+				<div class={`fs-box fs-${s.key}`}>
+					<span class="fs-name">{s.name}</span>
+					<span class="fs-amt">{usd(s.bps)}</span>
+					<span class="fs-pct">{pct(s.bps)} of the mint</span>
+					<span class="fs-meter"><b style={`--w:${s.bps / total}`} /></span>
+					<span class="fs-what">{s.what}</span>
+				</div>
+			))}
+		</div>
+	</div>
+	<figcaption class="viz-caption">
+		<b>Example:</b> a ${amount.toLocaleString('en-US')} mint into {basket.symbol}. Its {pct(total)} fee splits {pct(protocol)} to the treasury, {pct(staking)} to stakers and {pct(creator)} to its creator. If a basket has no creator, that share goes to the treasury. Redeems split the same way.
+	</figcaption>
+</figure>
+
+<style>
+	.fs {
+		--t: 9s;
+	}
+	.fs-top {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.35rem;
+	}
+	.fs-mint {
+		color: var(--viz-muted);
+	}
+	.fs-fee {
+		padding: 0.3rem 0.7rem;
+		border: 1px solid var(--viz-line);
+		border-radius: 999px;
+		white-space: nowrap;
+	}
+	.fs-mint b,
+	.fs-fee b {
+		font-weight: 600;
+	}
+	.fs-fee {
+		border-color: var(--viz-usdc);
+		background: var(--viz-usdc-soft);
+		color: #2f4a69;
+	}
+
+	/* Wires from the fee down to each share; one dot runs down each. */
+	.fs-wires {
+		position: relative;
+		height: 2.25rem;
+		margin: 0.4rem 0 0;
+	}
+	.fs-hwire {
+		position: absolute;
+		left: 16.667%;
+		right: 16.667%;
+		top: 0.9rem;
+		height: 2px;
+		background: var(--viz-line);
+	}
+	.fs-hwire::before {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: -0.9rem;
+		width: 2px;
+		height: 0.9rem;
+		background: var(--viz-line);
+	}
+	.fs-vwire {
+		position: absolute;
+		top: 0.9rem;
+		bottom: 0;
+		width: 2px;
+		margin-left: -1px;
+		background: var(--viz-line);
+	}
+	.fs-dot {
+		position: absolute;
+		left: var(--x);
+		top: 100%;
+		width: 0.6rem;
+		height: 0.6rem;
+		margin: -0.3rem 0 0 -0.3rem;
+		border-radius: 50%;
+		background: var(--viz-usdc);
+		opacity: 0;
+	}
+
+	.fs-boxes {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 0.6rem;
+	}
+	.fs-box {
+		display: grid;
+		gap: 0.2rem;
+		align-content: start;
+		padding: 0.6rem 0.65rem;
+		border: 1px solid var(--viz-line);
+		border-radius: 5px;
+		background: var(--viz-card);
+		min-width: 0;
+	}
+	.fs-name {
+		font-weight: 600;
+	}
+	.fs-amt {
+		font-size: 1.15rem;
+		font-weight: 600;
+		color: #2f4a69;
+		font-variant-numeric: tabular-nums;
+	}
+	.fs-pct {
+		font-size: 0.72rem;
+		color: var(--viz-muted);
+	}
+	.fs-meter {
+		height: 0.35rem;
+		margin: 0.2rem 0;
+		border-radius: 999px;
+		background: var(--viz-line-soft);
+		overflow: hidden;
+	}
+	.fs-meter b {
+		display: block;
+		height: 100%;
+		width: calc(var(--w) * 100%);
+		background: var(--viz-usdc);
+		border-radius: 999px;
+		transform-origin: left;
+	}
+	.fs-what {
+		font-size: 0.72rem;
+		line-height: 1.3;
+		color: var(--viz-muted);
+	}
+	@media (max-width: 30rem) {
+		.fs-boxes {
+			gap: 0.35rem;
+		}
+		.fs-box {
+			padding: 0.5rem 0.45rem;
+		}
+		.fs-amt {
+			font-size: 1rem;
+		}
+		.fs-what {
+			display: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.fs-fee {
+			animation: fs-fee var(--t) infinite both;
+		}
+		.fs-dot {
+			animation: fs-dot var(--t) infinite both;
+		}
+		.fs-amt,
+		.fs-pct {
+			animation: fs-amt var(--t) infinite both;
+		}
+		.fs-meter b {
+			animation: fs-meter var(--t) infinite both;
+		}
+	}
+
+	@keyframes fs-fee {
+		0%, 8% { opacity: 0; transform: scale(0.8); }
+		14% { opacity: 1; transform: scale(1.05); }
+		17%, 100% { opacity: 1; transform: scale(1); }
+	}
+	/* From under the fee, along the top wire to its column, then down into its box. */
+	@keyframes fs-dot {
+		0%, 20% { left: 50%; top: 0; opacity: 0; }
+		22% { left: 50%; top: 0.9rem; opacity: 1; }
+		32% { left: var(--x); top: 0.9rem; opacity: 1; }
+		40% { left: var(--x); top: 100%; opacity: 1; }
+		43%, 100% { left: var(--x); top: 100%; opacity: 0; }
+	}
+	@keyframes fs-amt {
+		0%, 39% { opacity: 0; }
+		45%, 100% { opacity: 1; }
+	}
+	@keyframes fs-meter {
+		0%, 40% { transform: scaleX(0); }
+		50%, 100% { transform: scaleX(1); }
+	}
+</style>

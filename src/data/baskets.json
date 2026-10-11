@@ -1,0 +1,652 @@
+{
+  "updated": "2026-10-10",
+  "programId": "bskthjNMRWQ4ekDLxaAzA1e39ThPmEtUgHY3XHfs7qv",
+  "protocolConfig": "3pWjMUvCf6edb4W1kicbt8tA4DJ5aNxUdcfupYRaD9v2",
+  "stakingPool": "4KYActSwKD9mTbfnw1sXpiqUg9yZxkjK8RWLhxsgXTPX",
+  "basketMint": "2rNBaMg5VAr1aMNCwAPdDZVgzzdTaNDebUnNqPFNmeta",
+  "usdcMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "baskets": [
+    {
+      "symbol": "SOLB",
+      "name": "Solana Bluechips",
+      "kind": "fixedUnits",
+      "description": "A broad view of the Solana economy, combining SOL with Jito, Jupiter, Pyth, Raydium and Orca. One basket spans the network itself and the staking, trading and price-data protocols built around it, with weights that evolve as token prices change.",
+      "index": "AeJ5QsYdtyXPUrwBmJ4PSXinfEjYPmGSZZXbj3LNvqzq",
+      "mint": "6HaHvba6SqQbV4A3fFMiLBsJV6d6yHwBcGDqRkDKe1D2",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": null,
+      "community": false,
+      "components": [
+        {
+          "symbol": "SOL",
+          "mint": "So11111111111111111111111111111111111111112",
+          "weightBps": 4000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "JTO",
+          "mint": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
+          "weightBps": 1800,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "JUP",
+          "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+          "weightBps": 1600,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "PYTH",
+          "mint": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+          "weightBps": 1400,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "RAY",
+          "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+          "weightBps": 700,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "ORCA",
+          "mint": "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",
+          "weightBps": 500,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "MEME",
+      "name": "Memecoin Almanac",
+      "kind": "fixedUnits",
+      "description": "Six distinct communities from Solana's memecoin scene: dogwifhat, BONK, Popcat, MEW, Fartcoin and Peanut the Squirrel. Fixed token quantities let each community's market performance shape its share of the basket. This is highly speculative exposure to attention, culture and sentiment.",
+      "index": "jnhncYE7JgCX41256VwVs8JBPkZ4Rk4MSeDSBZuAKD3",
+      "mint": "4SYJ36SYCzrsj4pWMDP3CyYuf2Yf1GHULFdekZpyqXa6",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": null,
+      "community": false,
+      "components": [
+        {
+          "symbol": "WIF",
+          "mint": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+          "weightBps": 2200,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "BONK",
+          "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+          "weightBps": 2000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "POPCAT",
+          "mint": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+          "weightBps": 1600,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "MEW",
+          "mint": "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5",
+          "weightBps": 1400,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "Fartcoin",
+          "mint": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
+          "weightBps": 1400,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "PNUT",
+          "mint": "2qEHjDLDLbuBgRYvsxhc5D6uDWAivNFZGan56P1tpump",
+          "weightBps": 1400,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "LSTY",
+      "name": "LST Yield Stack",
+      "kind": "fixedWeights",
+      "description": "Staked SOL exposure across JitoSOL, mSOL, bSOL, Infinity and JupSOL, combining several liquid-staking approaches in one basket. Staking rewards can accrue through the underlying tokens' value, while target allocations spread exposure across providers. Returns still depend on SOL and each staking protocol.",
+      "index": "FwmoaDwDCcSBMyxPty6pewCZXET7rEuinRoRFbuKMcMP",
+      "mint": "9FRhm7uBZdWguDQJVBQceqtviT6jX3gdEA8WJh9du6HA",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": {
+        "intervalDays": 30,
+        "driftBps": 500
+      },
+      "community": false,
+      "components": [
+        {
+          "symbol": "JitoSOL",
+          "mint": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
+          "weightBps": 3000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "mSOL",
+          "mint": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+          "weightBps": 2200,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "bSOL",
+          "mint": "bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1",
+          "weightBps": 1800,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "INF",
+          "mint": "5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm",
+          "weightBps": 1600,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "JupSOL",
+          "mint": "jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v",
+          "weightBps": 1400,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "DEXS",
+      "name": "Solana Exchange Leaders",
+      "kind": "fixedWeights",
+      "description": "Jupiter, Raydium and Orca bring together three major parts of Solana's trading ecosystem: swap aggregation and decentralized exchange liquidity. The basket uses target weights of 50%, 30% and 20% to balance their exposure. Holding these protocol tokens does not automatically pay out trading fees.",
+      "index": "AbbQSMuESNUA9CG46JSH2ykbsbfk2TpRHNXRf2C9gvmQ",
+      "mint": "3HUgwoyvY6AUQ6SkUkJ5beE3anyLjGGehyDTuYu9J7mY",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": {
+        "intervalDays": 30,
+        "driftBps": 500
+      },
+      "community": false,
+      "components": [
+        {
+          "symbol": "JUP",
+          "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+          "weightBps": 5000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "RAY",
+          "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+          "weightBps": 3000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "ORCA",
+          "mint": "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",
+          "weightBps": 2000,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "STKG",
+      "name": "Staking Governance",
+      "kind": "fixedUnits",
+      "description": "JTO, CLOUD and MNDE offer governance-token exposure to Jito, Sanctum and Marinade, three projects shaping Solana's staking ecosystem. Their weights move with market prices. The basket holds governance tokens rather than staked SOL, so it does not automatically earn liquid-staking rewards.",
+      "index": "EidvjqPKERmzGgfCAQdSNR63pvHGjbr8RruV1WDyJ7vK",
+      "mint": "5Jm2fSURJ4bPN462iiQtTyMRwY3CtZkmvui7uCTV869U",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": null,
+      "community": false,
+      "components": [
+        {
+          "symbol": "JTO",
+          "mint": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
+          "weightBps": 5000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "CLOUD",
+          "mint": "CLoUDKc4Ane7HeQcPpE3YHnznRxhMimJ4MyaUqyHFzAu",
+          "weightBps": 3000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "MNDE",
+          "mint": "MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey",
+          "weightBps": 2000,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "USDX",
+      "name": "USD Stablecoin Basket",
+      "kind": "fixedUnits",
+      "description": "A dollar-focused basket starting with equal exposure to native Solana USDC and USDT, spreading stablecoin exposure across two issuers. Fixed quantities avoid automatically buying more of a token if it loses its peg. The basket does not generate yield or guarantee a constant $1 value.",
+      "index": "8aobs9NvzETPYEsDBDfLf59cYDYK5f2vuk5E45k3Qs3q",
+      "mint": "CmXFoEtUDjLjbDJDZUdXMpNhhBe4qesZEjDJnqZxrRTW",
+      "feeBps": {
+        "total": 0,
+        "protocol": 0,
+        "creator": 0,
+        "staking": 0
+      },
+      "rebalance": null,
+      "community": false,
+      "components": [
+        {
+          "symbol": "USDC",
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "weightBps": 5000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "USDT",
+          "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+          "weightBps": 5000,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "SOLC",
+      "name": "Solana Balanced Core",
+      "kind": "fixedWeights",
+      "description": "A balanced approach to Solana exposure with target allocations of 40% SOL, 20% JitoSOL and 40% USDC. SOL and liquid staking provide network exposure, while the dollar allocation moderates sensitivity to SOL price moves. The basket remains exposed to market, staking and stablecoin risks.",
+      "index": "GTZMn4iJRfzvLnqfrpxuM5FH77huPjpsgzCYNADvaib6",
+      "mint": "BfSjb5RSWxwdK1jeLL5Z1XcZsrU2bvdwpSpZ55BLRijH",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": {
+        "intervalDays": 30,
+        "driftBps": 500
+      },
+      "community": false,
+      "components": [
+        {
+          "symbol": "SOL",
+          "mint": "So11111111111111111111111111111111111111112",
+          "weightBps": 4000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "USDC",
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "weightBps": 4000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "JitoSOL",
+          "mint": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
+          "weightBps": 2000,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "AISP",
+      "name": "Solana AI Infrastructure",
+      "kind": "fixedWeights",
+      "description": "Render, io.net and Grass connect three building blocks of AI infrastructure: rendering, distributed GPU compute and data collection. Target allocations of 50%, 25% and 25% combine these themes in one Solana basket. Exposure comes through their tokens, without operating hardware or collecting provider rewards.",
+      "index": "FBnDbdzWgNAH5L1wHUnoKL5uzKBwcSJTiMaCBp66Jgd7",
+      "mint": "3cwK7j9LpqGDywwvJQkHKY46nZ17xSMiMsAMMDFtHMvU",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": {
+        "intervalDays": 30,
+        "driftBps": 500
+      },
+      "community": false,
+      "components": [
+        {
+          "symbol": "RENDER",
+          "mint": "rndrizKT3MK1iimdxRdWabcF7Zg7AR5T4nud4EkHBof",
+          "weightBps": 5000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "IO",
+          "mint": "BZLbGTNCSFfoth2GYDtwr7e4imWzpR5jqcUuGEwr646K",
+          "weightBps": 2500,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "GRASS",
+          "mint": "Grass7B4RdKfBCjTKgSqnXkqjwiGvQyFbuSCUJr3XXjs",
+          "weightBps": 2500,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "DEFI",
+      "name": "Solana DeFi Infrastructure",
+      "kind": "fixedWeights",
+      "description": "A cross-section of Solana DeFi through Jupiter, Raydium, Kamino, Pyth, Jito and Orca. Target allocations span trading, lending, price data and staking infrastructure, reducing reliance on any single protocol. The basket holds protocol tokens and does not automatically collect their lending, staking or trading income.",
+      "index": "2XUsdyUwJLHLhz9qp1HPKS8oEVYKj8AS9CqDHRr7ypgk",
+      "mint": "9UAUvt4h4baiPMXA24xtcdzKXw2rJMpW1FCKPYkDiK3D",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": {
+        "intervalDays": 30,
+        "driftBps": 500
+      },
+      "community": false,
+      "components": [
+        {
+          "symbol": "JUP",
+          "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+          "weightBps": 2500,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "RAY",
+          "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+          "weightBps": 2000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "KMNO",
+          "mint": "KMNo3nJsBXfcpJTVhZcXLW7RmTwTt4GVFE7suUBo9sS",
+          "weightBps": 2000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "PYTH",
+          "mint": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+          "weightBps": 1500,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "JTO",
+          "mint": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
+          "weightBps": 1000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "ORCA",
+          "mint": "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",
+          "weightBps": 1000,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "MAJR",
+      "name": "Crypto Majors Reserve",
+      "kind": "fixedUnits",
+      "description": "Bitcoin, Ether and Solana exposure in one basket, with a small USDC reserve. Starting allocations are approximately 45% Coinbase cbBTC, 30% Wormhole-wrapped ETH, 20% SOL and 5% USDC; weights then move with prices. The Bitcoin and Ether positions carry their respective custodian and bridge risks.",
+      "index": "2JbJzwerCUxJqnqG1uXiLsYzwnb7sZCwyZYPgp3pMxdz",
+      "mint": "5cTvU74Q8SP66uzUUHMSwRaHND8hJoFF53HgUYhZ1T3e",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": null,
+      "community": false,
+      "components": [
+        {
+          "symbol": "cbBTC",
+          "mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+          "weightBps": 4500,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "ETH",
+          "mint": "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+          "weightBps": 3000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "SOL",
+          "mint": "So11111111111111111111111111111111111111112",
+          "weightBps": 2000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "USDC",
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "weightBps": 500,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "PHYS",
+      "name": "Wireless and Location",
+      "kind": "fixedUnits",
+      "description": "Two networks bringing crypto infrastructure into the physical world: Helium's wireless connectivity and GEODNET's precision positioning. The basket starts at 60% HNT and 40% GEOD, with weights that evolve with prices. It provides token exposure without operating hotspots or satellite reference stations.",
+      "index": "6Pw6hwJews5sGKs68Ta4VRriChvk9qCRtuPGswdpYaE",
+      "mint": "8Rv7XjAXhRMFcWw54V2ukDZHyPk6cRTN5q3i1NcetcT7",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": null,
+      "community": false,
+      "components": [
+        {
+          "symbol": "HNT",
+          "mint": "hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux",
+          "weightBps": 6000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "GEOD",
+          "mint": "7JA5eZdCzztSfQbJvS8aVVxMFfd81Rs9VvwnocV1mKHu",
+          "weightBps": 4000,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "DATA",
+      "name": "Cross-chain Data Infrastructure",
+      "kind": "fixedUnits",
+      "description": "Pyth delivers financial market data to applications, while Wormhole connects assets and messages across blockchains. This basket starts at 60% PYTH and 40% W, then lets market prices determine their weights. Both tokens remain unstaked, so staking rewards are not included.",
+      "index": "2YRMxw9ftG93jKyWcHFb36gViw62nqMZNhQFaVZzShgN",
+      "mint": "ErFnj69mfQ8KtUG4GKzemATHB2CZiDoibBeTTKwtcDd4",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": null,
+      "community": false,
+      "components": [
+        {
+          "symbol": "PYTH",
+          "mint": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+          "weightBps": 6000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "W",
+          "mint": "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ",
+          "weightBps": 4000,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "METADAO",
+      "name": "MetaDAO Ecosystem Index",
+      "kind": "fixedUnits",
+      "description": "MetaDAO is the Solana platform where organizations are governed by futarchy: traders bet on whether a proposal will raise the token's value, and those markets, not token votes, decide what passes. The basket holds META, MetaDAO's own token, alongside the ownership coins of eight companies that raised through its launchpad and whose treasuries are governed by markets rather than by their teams. It is an early-stage, high-risk bet on market-governed companies, and several of its tokens trade in thin markets.",
+      "index": "HVdP1tVLoyAKMJN68wWaKRA9FGRcjgAudScpVEThFQix",
+      "mint": "HABZjDWSLTF8eAc8SHfCK8amLD2nrgqFLUcKYDCmGswQ",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": null,
+      "community": false,
+      "components": [
+        {
+          "symbol": "META",
+          "mint": "METAwkXcqyXKy1AtsSgJ8JiUHwGCafnZL38n3vYmeta",
+          "weightBps": 2500,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "CRED",
+          "mint": "CREDBHvVqREBCAxMihzr8D1nepHMr2gmQoZWpmgGmeta",
+          "weightBps": 1800,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "SOLO",
+          "mint": "SoLo9oxzLDpcq1dpqAgMwgce5WqkRDtNXK7EPnbmeta",
+          "weightBps": 1600,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "P2P",
+          "mint": "P2PXup1ZvMpCDkJn3PQxtBYgxeCSfH39SFeurGSmeta",
+          "weightBps": 1000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "UMBRA",
+          "mint": "PRVT6TB7uss3FrUd2D9xs2zqDBsa3GbMJMwCQsgmeta",
+          "weightBps": 800,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "AVICI",
+          "mint": "BANKJmvhT8tiJRsBSS1n2HryMBPvT5Ze4HU95DUAmeta",
+          "weightBps": 800,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "OMFG",
+          "mint": "omfgRBnxHsNJh6YeGbGAmWenNkenzsXyBXm3WDhmeta",
+          "weightBps": 500,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "LASO",
+          "mint": "LASocYgQAo8GfypSjedNQgLft8y8DVGg1kSqR3smeta",
+          "weightBps": 500,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "CARS",
+          "mint": "CARSsxWPkpQWvfyRBwfGMGvysJBHdHGfE46X5MNgmeta",
+          "weightBps": 500,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "BUYB",
+      "name": "Protocol Buyback Index",
+      "kind": "fixedWeights",
+      "description": "Eight protocols that turn their revenue into buybacks of their own token: Hyperliquid, Pump.fun, Raydium, Jupiter, Orca, Jito, deBridge and Uniswap. As each protocol earns, it buys its own token on the open market, tying demand for the token to how much the protocol is used. The thesis depends on that revenue continuing: each protocol can change or end its program, and HYPE and UNI are held as Wormhole-bridged versions.",
+      "index": "HLeXRccnaHgZyYTztzcqK5ZpdjSzftT6RFxNdxQeWyNW",
+      "mint": "8DXdg6nRkQHwyqqxp1zHYeUvbBucPn27tkrszusuUacF",
+      "feeBps": {
+        "total": 10,
+        "protocol": 4,
+        "creator": 1,
+        "staking": 5
+      },
+      "rebalance": {
+        "intervalDays": 30,
+        "driftBps": 500
+      },
+      "community": true,
+      "components": [
+        {
+          "symbol": "HYPE",
+          "mint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
+          "weightBps": 2600,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "PUMP",
+          "mint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+          "weightBps": 1900,
+          "tokenProgram": "token-2022"
+        },
+        {
+          "symbol": "RAY",
+          "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+          "weightBps": 1500,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "JUP",
+          "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+          "weightBps": 1200,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "ORCA",
+          "mint": "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",
+          "weightBps": 900,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "JTO",
+          "mint": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
+          "weightBps": 700,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "DBR",
+          "mint": "DBRiDgJAMsM95moTzJs7M9LnkGErpbv9v6CUR1DXnUu5",
+          "weightBps": 700,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "UNI",
+          "mint": "uniHfuPhEQSrtpzXpJZDCSq53yaejKKpNhFUiKoHKHV",
+          "weightBps": 500,
+          "tokenProgram": "spl"
+        }
+      ]
+    }
+  ]
+}

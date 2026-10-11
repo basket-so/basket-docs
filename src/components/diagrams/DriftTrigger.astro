@@ -1,0 +1,267 @@
+---
+// The two rebalance triggers for one token: its weight wanders until it is 5 points off
+// target, a rebalance brings it back, and the 30-day clock starts over.
+// The track runs from 10% to 30% weight; ORCA targets 20% in DEXS.
+---
+
+<figure class="viz not-content dt">
+	<div class="viz-loop" aria-hidden="true">
+		<div class="dt-head">
+			<span class="viz-chip"><i style="--c:#d29a6e" />ORCA's weight</span>
+			<span class="dt-status">
+				<span class="dt-st dt-st1">Within 5 points: no trade</span>
+				<span class="dt-st dt-st2">5 points off: rebalance</span>
+				<span class="dt-st dt-st3">Back near target</span>
+			</span>
+		</div>
+		<div class="dt-track">
+			<span class="dt-band"></span>
+			<span class="dt-edge dt-lo"></span>
+			<span class="dt-edge dt-hi"></span>
+			<span class="dt-target"></span>
+			<span class="dt-dot"></span>
+		</div>
+		<div class="dt-scale">
+			<span style="left:25%">15%</span>
+			<span style="left:50%"><b>Target 20%</b></span>
+			<span style="left:75%">25%</span>
+		</div>
+
+		<div class="dt-clock">
+			<div class="dt-clock-head">
+				<span>Time since last rebalance</span>
+				<span>30 days</span>
+			</div>
+			<div class="dt-clock-bar"><b></b></div>
+		</div>
+
+		<div class="dt-gate">
+			<span>Mints and redeems</span>
+			<span class="dt-gate-state">
+				<span class="dt-open">Open</span>
+				<span class="dt-held">Waiting for the rebalance</span>
+			</span>
+		</div>
+	</div>
+	<figcaption class="viz-caption">
+		A rebalance is due when any token is <b>5 percentage points</b> off its target, or <b>30 days</b> after the last one, whichever comes first. Afterwards every token is back near target, and the 30-day clock starts over.
+	</figcaption>
+</figure>
+
+<style>
+	.dt {
+		--t: 12s;
+	}
+	.dt-head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+		margin-bottom: 0.9rem;
+	}
+	.dt-status {
+		display: grid;
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+	.dt-st {
+		grid-area: 1 / 1;
+		justify-self: end;
+		padding: 0.12rem 0.55rem;
+		border-radius: 999px;
+		white-space: nowrap;
+	}
+	.dt-st1,
+	.dt-st3 {
+		background: var(--viz-green-soft);
+		color: var(--viz-green);
+	}
+	.dt-st2 {
+		background: var(--viz-alert-soft);
+		color: var(--viz-alert);
+	}
+	.dt-st1,
+	.dt-st3 {
+		opacity: 0;
+	}
+
+	/* The weight track: 10% at the left edge, 30% at the right. */
+	.dt-track {
+		position: relative;
+		height: 2.2rem;
+		border-radius: 4px;
+		background: var(--viz-card);
+		border: 1px solid var(--viz-line);
+	}
+	.dt-band {
+		position: absolute;
+		inset: 0 25%;
+		background: var(--viz-green-soft);
+	}
+	.dt-edge {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 0;
+		border-left: 2px dashed var(--viz-green-mid);
+	}
+	.dt-lo {
+		left: 25%;
+	}
+	.dt-hi {
+		left: 75%;
+		border-left-color: var(--viz-alert);
+	}
+	.dt-target {
+		position: absolute;
+		left: 50%;
+		top: -0.3rem;
+		bottom: -0.3rem;
+		width: 2px;
+		margin-left: -1px;
+		background: var(--viz-ink);
+	}
+	.dt-dot {
+		position: absolute;
+		top: 50%;
+		left: 80%;
+		width: 1rem;
+		height: 1rem;
+		margin: -0.5rem 0 0 -0.5rem;
+		border-radius: 50%;
+		background: #d29a6e;
+		border: 2px solid var(--viz-alert);
+		box-shadow: 0 1px 3px rgba(40, 30, 20, 0.25);
+	}
+	.dt-scale {
+		position: relative;
+		height: 1.2rem;
+		margin-top: 0.3rem;
+		font-size: 0.7rem;
+		color: var(--viz-muted);
+	}
+	.dt-scale span {
+		position: absolute;
+		transform: translateX(-50%);
+		white-space: nowrap;
+	}
+	.dt-scale b {
+		color: var(--viz-ink);
+		font-weight: 600;
+	}
+
+	.dt-clock {
+		margin-top: 1rem;
+	}
+	.dt-clock-head,
+	.dt-gate {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.5rem;
+		font-size: 0.75rem;
+		color: var(--viz-muted);
+	}
+	.dt-clock-bar {
+		height: 0.45rem;
+		margin-top: 0.3rem;
+		border-radius: 999px;
+		background: var(--viz-line-soft);
+		overflow: hidden;
+	}
+	.dt-clock-bar b {
+		display: block;
+		height: 100%;
+		background: var(--viz-ink-2);
+		transform-origin: left;
+		transform: scaleX(0.45);
+		border-radius: 999px;
+	}
+	.dt-gate {
+		margin-top: 0.85rem;
+		padding-top: 0.7rem;
+		border-top: 1px solid var(--viz-line-soft);
+	}
+	.dt-gate-state {
+		display: grid;
+		font-weight: 600;
+	}
+	.dt-gate-state > span {
+		grid-area: 1 / 1;
+		justify-self: end;
+		white-space: nowrap;
+	}
+	.dt-open {
+		color: var(--viz-green);
+	}
+	.dt-held {
+		color: var(--viz-copper);
+		opacity: 0;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.dt-dot {
+			animation: dt-dot var(--t) infinite both;
+		}
+		.dt-hi {
+			animation: dt-edge var(--t) infinite both;
+		}
+		.dt-st1 { animation: dt-st1 var(--t) infinite both; }
+		.dt-st2 { animation: dt-st2 var(--t) infinite both; }
+		.dt-st3 { animation: dt-st3 var(--t) infinite both; }
+		.dt-clock-bar b {
+			animation: dt-clock var(--t) infinite both;
+		}
+		.dt-open { animation: dt-open var(--t) infinite both; }
+		.dt-held { animation: dt-held var(--t) infinite both; }
+	}
+
+	/* Weight w sits at left (w - 10) × 5%. It wanders 20 → 22.5 → 19 → 24 → 26, crossing
+	   25 at about 40%, waits for the rebalance, then lands at 20.4. */
+	@keyframes dt-dot {
+		0% { left: 50%; border-color: var(--viz-card); }
+		10% { left: 62%; }
+		20% { left: 45%; }
+		31% { left: 70%; border-color: var(--viz-card); }
+		40% { left: 76%; border-color: var(--viz-alert); }
+		44%, 50% { left: 80%; border-color: var(--viz-alert); }
+		62% { left: 52%; border-color: var(--viz-card); }
+		100% { left: 52%; border-color: var(--viz-card); }
+	}
+	@keyframes dt-edge {
+		0%, 38% { border-left-color: var(--viz-green-mid); }
+		41%, 58% { border-left-color: var(--viz-alert); }
+		62%, 100% { border-left-color: var(--viz-green-mid); }
+	}
+	@keyframes dt-st1 {
+		0%, 38% { opacity: 1; }
+		40%, 100% { opacity: 0; }
+	}
+	@keyframes dt-st2 {
+		0%, 38% { opacity: 0; }
+		40%, 60% { opacity: 1; }
+		62%, 100% { opacity: 0; }
+	}
+	@keyframes dt-st3 {
+		0%, 60% { opacity: 0; }
+		62%, 100% { opacity: 1; }
+	}
+	/* The clock runs, resets when the rebalance finishes, and runs again. */
+	@keyframes dt-clock {
+		0% { transform: scaleX(0.3); }
+		50% { transform: scaleX(0.62); }
+		60% { transform: scaleX(0.66); }
+		63% { transform: scaleX(0); }
+		100% { transform: scaleX(0.24); }
+	}
+	@keyframes dt-open {
+		0%, 44% { opacity: 1; }
+		46%, 61% { opacity: 0; }
+		63%, 100% { opacity: 1; }
+	}
+	@keyframes dt-held {
+		0%, 44% { opacity: 0; }
+		46%, 61% { opacity: 1; }
+		63%, 100% { opacity: 0; }
+	}
+</style>

@@ -1,0 +1,41 @@
+---
+title: Finish or recover a mint or redeem
+description: What happens if a mint or redeem stops partway, and how to continue or get your tokens back.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import RecoverTimeline from '../../../components/diagrams/RecoverTimeline.astro';
+
+A mint or redeem takes several transactions. If one fails, you reject one, or you close the tab, the operation stays open with everything it has done so far. Nothing is lost, and no one else can take it.
+
+The app checks for an open operation every 15 seconds while you're on a basket's page, and shows what you can do.
+
+<RecoverTimeline />
+
+## Continue before it expires
+
+Every mint and redeem expires **20 minutes** after it opens. Until then:
+
+- **Mint:** the panel shows **Continue your mint** with how many swaps are done, and a **Continue mint** button. It continues the same mint with fresh quotes. Completed purchases are kept, and your original spending limit still applies.
+- **Redeem:** continue the remaining sales the same way. If no swap has run yet, you can also cancel the redeem right away to get your basket tokens back.
+
+## Recover after it expires
+
+Once an operation expires, it can't continue. It can still be cancelled and unwound:
+
+- **A mint** returns the **tokens it already bought**, not USDC. Click **Cancel mint & recover tokens**. You can sell them or keep them.
+- **A redeem** returns its **unsold components**. If nothing was sold, it re-mints your basket tokens instead. Click **Cancel redemption & recover tokens**.
+
+Until recovery finishes, you can't open a new mint or redeem on that basket. The app shows **Recover the interrupted operation first**.
+
+<Aside title="Anyone can unwind an expired operation">
+Cancelling an expired operation doesn't need your signature, so Basket's keeper also settles expired operations. When it does, your tokens go to the **refund escrow**, a holding account the program controls. The app then shows **Tokens ready to claim**. Click **Claim tokens** to move them to your wallet. Only you can claim them.
+</Aside>
+
+## Why it works this way
+
+Each user has their own operation per basket, so one person's stuck mint never blocks anyone else. Anyone can unwind an expired operation and pay it out without the owner's cooperation. So expired operations can't keep a basket's rebalances waiting either. See [Security and trust](/protocol/security/).
+
+## Account deposits
+
+Each mint or redeem creates a small on-chain record. It is paid for from your SOL as a refundable deposit. Once the operation is finished and nothing is left to claim, anyone can close that record. The deposit always goes back to you.
