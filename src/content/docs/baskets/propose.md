@@ -14,7 +14,7 @@ Several live baskets started as ideas from the community, including METADAO and 
 
 ## How it works today
 
-Bring your proposal to the Basket community on Discord. Basket reviews each one for liquidity, token risks (bridged tokens, issuer controls, transfer fees) and overlap with existing baskets. It suggests changes where needed.
+Bring your proposal to the Basket community on [Discord](https://discord.gg/NPMQHyj33k). Basket reviews each one for liquidity, token risks (bridged tokens, issuer controls, transfer fees) and overlap with existing baskets. It suggests changes where needed.
 
 If it goes ahead, Basket creates and runs the basket. It holds the basket's authority, runs the keeper for rebalancing, and lists the basket in the app.
 

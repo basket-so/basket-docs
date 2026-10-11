@@ -30,6 +30,7 @@ export default defineConfig({
 			],
 			social: [
 				{ icon: 'x.com', label: 'Basket on X', href: 'https://x.com/Basket_on_sol' },
+				{ icon: 'discord', label: 'Basket on Discord', href: 'https://discord.gg/NPMQHyj33k' },
 			],
 			sidebar: [
 				{
