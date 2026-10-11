@@ -1,68 +1,71 @@
 # Basket Docs
 
-The documentation site for Basket, served at **docs.basketsolana.xyz**. It's built with [Astro Starlight](https://starlight.astro.build): Markdown pages compiled to a static site, with built-in search.
+Documentation for [Basket](https://app.basketsolana.xyz), a protocol on Solana that turns a set of tokens into one fully backed token you can mint and redeem with USDC.
 
-## Commands
+**Read the docs:** [docs.basketsolana.xyz](https://docs.basketsolana.xyz)
 
-| Command | What it does |
+The site is built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build), and includes full-text search.
+
+## Getting started
+
+You need [Node.js](https://nodejs.org) 22.12 or later.
+
+```sh
+npm install
+npm run dev
+```
+
+The dev server runs at http://localhost:4321 and reloads as you edit.
+
+| Command | Description |
 |---|---|
-| `npm install` | Install dependencies |
-| `npm run dev` | Local dev server at `localhost:4321` |
-| `npm run build` | Build the site into `dist/`, including the search index |
-| `npm run preview` | Serve the built site locally (search only works here, not in dev) |
-| `npm run sync-baskets` | Refresh the basket list from the live app (see below) |
+| `npm run dev` | Start the local dev server |
+| `npm run build` | Build the static site into `dist/` |
+| `npm run preview` | Serve the production build locally |
+| `npm run sync-baskets` | Refresh the basket data from the Basket app |
 
-## Layout
+Search is generated during the build, so it works in `npm run preview` but not in `npm run dev`.
+
+## Project structure
 
 ```
 src/
-  content/docs/        one Markdown (.md/.mdx) file per page; the path is the URL
-    start/             What is Basket, Quickstart
-    guides/            mint, redeem, recover, staking, markets
-    baskets/           live baskets, basket types, rebalancing, composition changes, proposing
-    protocol/          how it works, fees, oracle, security, addresses
-    resources/         risks, FAQ, glossary
-  components/BasketList.astro   renders the live basket list
-  components/diagrams/          animated diagrams of the core concepts (pure CSS)
-  components/overrides/         keeps the site light-only (no theme picker)
-  data/baskets.json             every live basket: weights, fees, addresses
-  styles/basket.css             Basket's colors and font on Starlight
-  styles/diagrams.css           shared pieces for the diagrams
-astro.config.mjs       site settings and the sidebar
+├── content/docs/      Pages, one Markdown or MDX file each (the file path is the URL)
+│   ├── start/         Introduction and quickstart
+│   ├── guides/        Minting, redeeming, recovery, staking and markets
+│   ├── baskets/       Live baskets, basket types, rebalancing and proposals
+│   ├── protocol/      How it works, fees, the price oracle, security and addresses
+│   └── resources/     Risks, FAQ and glossary
+├── components/        Basket list, animated diagrams and theme overrides
+├── data/baskets.json  The live baskets: components, weights, fees and addresses
+└── styles/            Site theme and diagram styles
+astro.config.mjs       Site settings and sidebar navigation
 ```
 
-To add a page, create a file under `src/content/docs/` and add it to the `sidebar` in `astro.config.mjs`.
+## Contributing
 
-The site is light-only and uses one typeface, DM Sans, for everything including code.
+Corrections and improvements are welcome. Open an issue or a pull request.
 
-## Diagrams
+- **Edit a page:** change its file in `src/content/docs/`.
+- **Add a page:** create a new `.md` or `.mdx` file there, then add it to the `sidebar` in `astro.config.mjs`.
+- **Diagrams:** each animated diagram is a component in `src/components/diagrams/`, used from `.mdx` pages. They are pure CSS, and they show a static version to readers who prefer reduced motion.
 
-Each core concept has a looping CSS animation: what a basket is, mint, redeem, recovery, staking rewards, fixed units vs fixed weights, rebalance triggers, composition changes, backing, fees and the oracle. Each one is an Astro component in `src/components/diagrams/`, imported into its page (pages that use one are `.mdx`).
+Statements about how the protocol works should match the on-chain program and the app.
 
-- Every part of a diagram animates on one loop of length `--t`, with keyframe percentages as the timeline.
-- Base styles draw the complete picture. Motion is added only under `prefers-reduced-motion: no-preference`, so readers who turn animation off get a static diagram with every step listed.
-- BasketConcept, MintFlow, RedeemFlow and FeeSplit read their baskets and fees from `baskets.json`. The rest use worked examples.
+## Basket data
 
-## Keeping the basket data current
+The Live baskets, Fees and Addresses pages are generated from `src/data/baskets.json`. To update it from the Basket app's public API, run:
 
-The Live baskets, Fees and Addresses pages read `src/data/baskets.json`. After a basket launches, or its fees or composition change, run:
-
-```
+```sh
 npm run sync-baskets
 ```
 
-It reads the app's public API (`app.basketsolana.xyz/api/protocol?public=1`) and rewrites the file with every basket the app lists, using the app's descriptions. Fixed-weight baskets get their target weights from the chain. Fixed-units baskets store token quantities, not weights, so their launch weights are kept from the existing file; for a new fixed-units basket, add each component's `weightBps` by hand.
+Fixed-weight baskets take their target weights from the API. Fixed-unit baskets keep the launch weights already in the file, so a new fixed-unit basket needs its components' `weightBps` added by hand.
 
-Facts in the prose pages (fee caps, the oracle's checks, rebalance limits) come from the program in `basket-rs` and the app in `basket-ui`. Update them when those change.
+## Deployment
 
-## Deploying
+The site is served as static files by nginx. The `Dockerfile` builds it and `fly.toml` deploys it to [Fly.io](https://fly.io):
 
-The site runs on Fly as the app `basket-docs`, on one always-on machine (`fly.toml`). `Dockerfile` builds it and serves `dist/` with nginx on port 8080. To publish changes:
-
-```
+```sh
 fly deploy --ha=false
 ```
-
-`--ha=false` keeps it to one machine; a static site doesn't need two.
-
-The domain `docs.basketsolana.xyz` has a Fly certificate (`fly certs show docs.basketsolana.xyz`). Its DNS points at the app with an A record to `66.241.125.57` and an AAAA record to `2a09:8280:1::1b0:a9aa:0`. `fly certs setup docs.basketsolana.xyz` lists these and the alternatives.
