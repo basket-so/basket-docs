@@ -57,14 +57,12 @@ Facts in the prose pages (fee caps, the oracle's checks, rebalance limits) come 
 
 ## Deploying
 
-The site deploys to Fly as the app `basket-docs`: `Dockerfile` builds it and serves `dist/` with nginx on port 8080.
-
-First deploy:
+The site runs on Fly as the app `basket-docs`, on one always-on machine (`fly.toml`). `Dockerfile` builds it and serves `dist/` with nginx on port 8080. To publish changes:
 
 ```
-fly apps create basket-docs
-fly deploy
-fly certs add docs.basketsolana.xyz
+fly deploy --ha=false
 ```
 
-Then add the DNS record Fly prints for `docs.basketsolana.xyz`, usually a CNAME to `basket-docs.fly.dev`. After that, `fly deploy` publishes changes.
+`--ha=false` keeps it to one machine; a static site doesn't need two.
+
+The domain `docs.basketsolana.xyz` has a Fly certificate (`fly certs show docs.basketsolana.xyz`). Its DNS points at the app with an A record to `66.241.125.57` and an AAAA record to `2a09:8280:1::1b0:a9aa:0`. `fly certs setup docs.basketsolana.xyz` lists these and the alternatives.
