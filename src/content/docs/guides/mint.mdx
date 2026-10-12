@@ -14,7 +14,7 @@ Enter a **USDC budget** in the Mint panel of a basket's page. The app asks Jupit
 
 | Line | Meaning |
 |---|---|
-| **You receive** | Basket tokens you'll get, sized to fit your budget. |
+| **You receive at least** | Basket tokens you'll get, sized to fit your budget. You usually get slightly more (see below). |
 | **Estimated spend** | USDC the swaps will use, plus the mint fee. |
 | **Unused budget** | What's left of your budget. It never leaves your wallet. |
 | **NAV per token** | What one basket token's holdings are worth at current prices. |
@@ -47,6 +47,7 @@ When a basket has no supply, the first mint uses the basket's configured token a
 
 ## Good to know
 
+- **Swap extras come back to you.** A swap usually delivers a bit more of its token than the mint needs, often about 1%. The program finds the smallest extra across all the tokens and mints you that much more. Other holders never lose from it.
 - **Only USDC.** The Mint panel takes USDC. To start from SOL or another token, swap to USDC first, or buy the basket token in [Markets](/guides/markets/) if it has a pool.
 - **Mints pause during rebalances.** While a fixed-weight basket is rebalancing, new mints and redeems wait for it to finish. The app tells you, and nothing is charged.
 - **One operation at a time per basket.** You can't open a second mint or redeem on the same basket until the first one is finished or recovered. Other people's mints never wait on yours.

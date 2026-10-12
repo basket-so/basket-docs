@@ -32,9 +32,9 @@ Buying or selling every component needs one swap per token. With many tokens tha
 **Mint**
 
 1. **Open** the intent. The program records how much of each token is needed, the fee rates, your spending limit and an expiry of up to 30 minutes. The app uses 20.
-2. **Fill** each component, in batches. A fill is a Jupiter swap from your USDC straight into the vault. The program checks that the vault received at least what was needed, and books any extra as backing.
+2. **Fill** each component, in batches. A fill is a Jupiter swap from your USDC straight into the vault. The program checks that the vault received at least what was needed, and books all of it as backing. Swaps usually deliver a little extra, and the program notes the smallest extra across components. The USDC component is a plain transfer, so it is filled last and topped up by that same share.
 3. **Collect** the fee in USDC, on top of what the swaps spent.
-4. **Finalize.** The program checks the total spent against your limit and mints your basket tokens.
+4. **Finalize.** The program checks the total spent against your limit and mints your basket tokens. You get the amount you asked for plus that smallest extra share. Every component then backs each token at least as well as before, so the extra goes to you without costing other holders anything.
 
 **Redeem**
 
