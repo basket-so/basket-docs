@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-10",
+  "updated": "2026-10-16",
   "programId": "bskthjNMRWQ4ekDLxaAzA1e39ThPmEtUgHY3XHfs7qv",
   "protocolConfig": "3pWjMUvCf6edb4W1kicbt8tA4DJ5aNxUdcfupYRaD9v2",
   "stakingPool": "4KYActSwKD9mTbfnw1sXpiqUg9yZxkjK8RWLhxsgXTPX",
@@ -644,6 +644,51 @@
           "symbol": "UNI",
           "mint": "uniHfuPhEQSrtpzXpJZDCSq53yaejKKpNhFUiKoHKHV",
           "weightBps": 500,
+          "tokenProgram": "spl"
+        }
+      ]
+    },
+    {
+      "symbol": "SOV",
+      "name": "Store of Value Index",
+      "kind": "fixedWeights",
+      "description": "Four assets built around scarcity: ORE, Zcash, gold and bitcoin. Bitcoin and Zcash are capped at 21 million coins, ORE is mined on Solana under its own hard cap, and gold's supply grows only as fast as it can be mined, so none of them can be printed at will. ZEC is bridged to Solana, and gold and bitcoin are held as Tether's XAUt0 and Coinbase's cbBTC, which rely on their issuers holding the metal and coins behind them.",
+      "index": "5odgX8DVHcfEybrUCRVMMFXyjjidZwY7zSKWLkoXHRy6",
+      "mint": "4MFbWbaJAzkqzrPBUQSoFMM2JJ7j4emn4PUsQy3DNzYv",
+      "feeBps": {
+        "total": 10,
+        "protocol": 5,
+        "creator": 0,
+        "staking": 5
+      },
+      "rebalance": {
+        "intervalDays": 30,
+        "driftBps": 500
+      },
+      "community": false,
+      "components": [
+        {
+          "symbol": "ORE",
+          "mint": "oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp",
+          "weightBps": 5000,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "ZEC",
+          "mint": "A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS",
+          "weightBps": 1500,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "XAUt0",
+          "mint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+          "weightBps": 1500,
+          "tokenProgram": "spl"
+        },
+        {
+          "symbol": "cbBTC",
+          "mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+          "weightBps": 2000,
           "tokenProgram": "spl"
         }
       ]
