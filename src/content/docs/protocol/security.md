@@ -76,7 +76,7 @@ The program is built so that no single user can stop others from using a basket:
 
 - A basket can't hold its own token.
 - A Token-2022 token that charges transfer fees can't be a component. A fee taken on the way into a vault would leave the basket's books showing more than its vault holds.
-- Tokens added later by a composition change must be classic SPL tokens.
+- Tokens added later by a composition change follow the same rules.
 - Community baskets have stricter rules, listed under [Community baskets](#community-baskets).
 
 Tokens like USDC and USDT have issuers who can freeze accounts. Some Token-2022 tokens give their issuer other controls. Those powers belong to the token's issuer, not to Basket. They're covered in [Risks](/resources/risks/).

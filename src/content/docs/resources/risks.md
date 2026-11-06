@@ -22,6 +22,10 @@ The tokens in a basket bring their own risks, which Basket doesn't control:
 - **Issuer controls.** Some tokens' issuers can freeze accounts, as Circle and Tether can for USDC and USDT. Some Token-2022 tokens let their issuer add a transfer hook or other controls. If an issuer used these powers on a basket's vault, it could stop that token from moving. That would block mints, redeems and rebalances for that basket.
 - **Protocol tokens** depend on their protocols. A token's buybacks, staking or fee programs can change or stop.
 
+## Community baskets
+
+Anyone can create a community basket, and Basket doesn't review them. Their tokens only have to pass the program's rules, so a community basket can hold thinly traded, risky or worthless tokens, and its name and description are the creator's own claims. Check what a community basket holds before you mint it. Basket's own baskets are marked Core in the app. The rules every community basket runs under are in [Security and trust](/protocol/security/#community-baskets).
+
 ## Smart contract risk
 
 Basket's program and the programs it calls can have bugs. Basket's upgrade key can upgrade the program. That lets problems be fixed quickly, but it also means trusting that key. See [Security and trust](/protocol/security/).

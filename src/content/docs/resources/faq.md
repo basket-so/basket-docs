@@ -37,7 +37,7 @@ Not on their own. A basket is worth what its tokens are worth. If a token's yiel
 
 ## Who decides what's in a basket?
 
-Each basket's authority, which today is Basket. Fixed-units baskets never change. Fixed-weight baskets can change through a composition change with three days' notice. Anyone can propose a new basket. See [Propose a basket](/baskets/propose/).
+Each basket's authority: Basket for its own Core baskets, and the creator for a community basket. Fixed-units baskets never change. Fixed-weight baskets can change through a composition change with three days' notice. Anyone can [create a basket](/baskets/create/) or [propose one](/baskets/propose/) for Basket to run.
 
 ## Can fees change?
 

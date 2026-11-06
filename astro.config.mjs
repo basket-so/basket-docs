@@ -57,6 +57,7 @@ export default defineConfig({
 						{ label: 'Fixed units and fixed weights', slug: 'baskets/basket-types' },
 						{ label: 'Rebalancing', slug: 'baskets/rebalancing' },
 						{ label: 'Composition changes', slug: 'baskets/composition-changes' },
+						{ label: 'Create a basket', slug: 'baskets/create' },
 						{ label: 'Propose a basket', slug: 'baskets/propose' },
 					],
 				},

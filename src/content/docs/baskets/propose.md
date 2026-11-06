@@ -1,9 +1,9 @@
 ---
 title: Propose a basket
-description: Suggest a new basket, and how proposers can earn from the baskets they propose.
+description: Suggest a new basket for Basket to run, and how proposers can earn from the baskets they propose.
 ---
 
-Several live baskets started as ideas from the community, including METADAO and BUYB. If you have a theme you'd like to hold as one token, propose it.
+Several live baskets started as ideas from the community, including METADAO and BUYB. If you have a theme you'd like to hold as one token, propose it, and Basket may run it as a Core basket. You can also [create it yourself](/baskets/create/) as a community basket.
 
 ## What makes a good basket
 
@@ -12,7 +12,7 @@ Several live baskets started as ideas from the community, including METADAO and 
 - **Sensible weights**, and a choice between [fixed units and fixed weights](/baskets/basket-types/).
 - **Up to 40 tokens.** In practice, most baskets hold 2 to 10.
 
-## How it works today
+## How proposing works
 
 Bring your proposal to the Basket community on [Discord](https://discord.gg/NPMQHyj33k). Basket reviews each one for liquidity, token risks (bridged tokens, issuer controls, transfer fees) and overlap with existing baskets. It suggests changes where needed.
 

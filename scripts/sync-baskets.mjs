@@ -22,7 +22,8 @@ const indexes = (await response.json()).live?.indexes;
 if (!Array.isArray(indexes) || !indexes.length) throw new Error('The API listed no baskets');
 
 const baskets = indexes
-	.filter((index) => index.description)
+	// Only the baskets Basket runs; community baskets, made by anyone, stay in the app.
+	.filter((index) => index.description && !index.community)
 	.map((index) => {
 		const fixedWeights = index.kind === 'fixedWeights';
 		const known = new Map((previous.get(index.mint)?.components ?? []).map((c) => [c.mint, c]));

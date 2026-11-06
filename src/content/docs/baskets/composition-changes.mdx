@@ -31,4 +31,4 @@ The authority can cancel a pending change at any time.
 - A change can add at most 10 tokens, and the basket can't exceed 20 tokens in total.
 - Every token kept or added needs a weight of at least 0.5%. To remove a token, give it a weight of 0.
 - The weights must sum to 100%, and the change has to actually change something.
-- The USDC slot's weight can't change. Tokens added by a change must be classic SPL tokens.
+- The USDC slot's weight can't change. Tokens added by a change follow the same rules as at creation: classic SPL or Token-2022, never a token that charges transfer fees.
