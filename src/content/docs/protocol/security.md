@@ -39,7 +39,7 @@ The program also supports **community baskets**, created by wallets other than B
 - **Fees.** The creator chooses the fee in steps of 0.10%, from 0.10% up to 1%. Each step splits 0.04% to the Basket treasury, 0.01% to the creator and 0.05% to BASKET stakers: 40%, 10% and 50% of the fee. The creator can't change that split, can't set a fee of zero, and needs to give three days' notice before raising the fee. Basket can change these terms for baskets created later; a basket keeps the split it was created with.
 - **Fixed by the protocol.** Where the protocol's share goes, the keeper, the supply cap, pausing mints or rebalances, and the basket token's metadata. A creator can't pause anything.
 - **Rebalances.** Only the keeper can request or open a rebalance, or stop one early, so a creator can't hold mints and redeems back.
-- **Tokens.** Only tokens whose transfers nobody else controls: no freeze authority (USDC excepted), and on Token-2022 no extension that can charge, block or take a transfer. This applies to tokens added by composition changes too.
+- **Tokens.** Tokens that charge transfer fees, run a transfer hook, can't be transferred or start every account frozen are refused. Tokens whose issuer can freeze or pause them, such as tokenized stocks, are allowed: if one stops moving, a redeem can skip it and rebalances leave it out. The same rules apply to tokens added by composition changes.
 - **Symbols.** No two baskets share a symbol, or symbols that only differ by 0 and O or 1 and I.
 
 Like any basket's authority, a creator can propose composition changes, which give holders three days' notice, and hand the basket to another wallet.

@@ -19,7 +19,7 @@ The tokens in a basket bring their own risks, which Basket doesn't control:
 
 - **Bridged tokens** depend on their bridge. HYPE, ETH and UNI, for example, are held as Wormhole-bridged versions.
 - **Stablecoins** depend on their issuer and can lose their peg.
-- **Issuer controls.** Some tokens' issuers can freeze accounts, as Circle and Tether can for USDC and USDT. Some Token-2022 tokens let their issuer add a transfer hook or other controls. If an issuer used these powers on a basket's vault, it could stop that token from moving. That would block mints, redeems and rebalances for that basket.
+- **Issuer controls.** Some tokens' issuers can freeze accounts, as Circle and Tether can for USDC and USDT, and tokenized stocks give their issuers similar powers. If an issuer froze a basket's vault, that token would stop moving: the basket couldn't be minted, rebalances would leave the token out, and a redeem could skip it, giving up that token's share.
 - **Protocol tokens** depend on their protocols. A token's buybacks, staking or fee programs can change or stop.
 
 ## Community baskets

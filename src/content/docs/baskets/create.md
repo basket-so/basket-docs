@@ -30,7 +30,7 @@ The basket starts at $1.00 and appears in the app within a few minutes.
 - Basket's keeper does the rebalancing.
 - You can't pause the basket or cap its supply.
 - Raising the fee takes three days' notice.
-- Tokens can't have a freeze authority (USDC excepted) or transfer controls.
+- Tokens with transfer fees or a transfer hook are refused. Tokens an issuer can freeze, like tokenized stocks, are allowed.
 
 Full details are in [Security and trust](/protocol/security/#community-baskets). Basket doesn't review community baskets; see [Risks](/resources/risks/#community-baskets).
 
