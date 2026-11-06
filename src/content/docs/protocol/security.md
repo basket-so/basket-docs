@@ -34,7 +34,7 @@ The authority can't do any of the things listed under [What nobody can do](#what
 
 ## Community baskets
 
-The program also supports **community baskets**, created by wallets other than Basket's for a creation fee paid to the Basket treasury: 0.1 SOL today, which Basket can change but never above 1 SOL. None exist yet, and creating one needs Basket's approval until creation is opened to everyone. A community basket's creator gets far less control than the authority of one of Basket's own baskets:
+The program also supports **community baskets**, created by wallets other than Basket's for a creation fee paid to the Basket treasury: 0.1 SOL today, which Basket can change but never above 1 SOL. Any wallet can create one. A community basket's creator gets far less control than the authority of one of Basket's own baskets:
 
 - **Fees.** The creator chooses the fee in steps of 0.10%, from 0.10% up to 1%. Each step splits 0.04% to the Basket treasury, 0.01% to the creator and 0.05% to BASKET stakers: 40%, 10% and 50% of the fee. The creator can't change that split, can't set a fee of zero, and needs to give three days' notice before raising the fee. Basket can change these terms for baskets created later; a basket keeps the split it was created with.
 - **Fixed by the protocol.** Where the protocol's share goes, the keeper, the supply cap, pausing mints or rebalances, and the basket token's metadata. A creator can't pause anything.
